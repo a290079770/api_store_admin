@@ -7,63 +7,42 @@ Vue.use(Router)
 export default new Router({
   routes: [{
       path: '/login',
-      component: resolve => require(['@/components/login/Login'], resolve)
+      component: resolve => require(['@/components/login/Login_index'], resolve)
     }, 
     {
-      path: '/wrap',
-      component: resolve => require(['@/components/client/wrap'], resolve),
-      redirect: 'wrap/addExp',
+      path: '/admin',
+      component: resolve => require(['@/components/admin/admin'], resolve),
       beforeEnter: (to, from, next) => {
-        if (sessionStorage.getItem('userId') && sessionStorage.getItem('userId') != 'undefined' && sessionStorage.getItem('nickname') && sessionStorage.getItem('nickname') != 'undefined') {
+        if (sessionStorage.getItem('userId') && sessionStorage.getItem('userId') != 'undefined' ) {
           next()
         } else {
           next({ path: '/login' })
         }
       },
-//    redirect:'/wrap/addExp',
+      redirect:'/admin/investigate',
       children:[
          {
-            path: 'addExp',
-            component: resolve => require(['@/components/client/addExp'], resolve),
+            path: 'investtype',
+            component: resolve => require(['@/components/admin/investtype'], resolve),
          },
          {
-            path: 'addExpForm',
-            component: resolve => require(['@/components/client/addExpForm'], resolve),
+            path: 'investigate',
+            component: resolve => require(['@/components/admin/investigate'], resolve),
          },
          {
-            path: 'addExpSetForm',
-            component: resolve => require(['@/components/client/addExpSetForm'], resolve),
+            path: 'review',
+            component: resolve => require(['@/components/admin/review'], resolve),
          },
          {
-            path: 'addExpChainForm',
-            component: resolve => require(['@/components/client/addExpChainForm'], resolve),
+            path: 'systemLog',
+            component: resolve => require(['@/components/admin/systemLog'], resolve),
          },
          {
-            path: 'reView',
-            component: resolve => require(['@/components/client/reView'], resolve),
-         },
-         {
-            path: 'reViewList',
-            component: resolve => require(['@/components/client/reViewList'], resolve),
-         },
-         {
-            path: 'updateList',
-            component: resolve => require(['@/components/client/updateList'], resolve),
-         },{
-            path: 'parse',
-            component: resolve => require(['@/components/client/parse'], resolve),
-         },
-         {
-            path: 'parseKoi',
-            component: resolve => require(['@/components/client/parseKoi'], resolve),
-         },
-         {
-            path: 'messageList',
-            component: resolve => require(['@/components/client/messageList'], resolve),
+            path: 'userAdmin',
+            component: resolve => require(['@/components/admin/userAdmin'], resolve),
          }
       ]
     },
-    
     {
       path: '*',redirect: '/login'
     },

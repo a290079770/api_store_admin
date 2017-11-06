@@ -20,8 +20,8 @@ import util from './util'
 Vue.use(util);
 
 import router from './router/router.js'
-import './assets/normalize.css'
-//引入初始化样式
+// import './assets/normalize.css'
+// //引入初始化样式
 
 Vue.config.productionTip = false
 /* eslint-disable no-new */

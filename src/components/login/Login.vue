@@ -1,5 +1,12 @@
 <template>
   <div class="login" :style='winSize'>
+    <div class="content-title login-content-title">
+      <div class="content-title-right">
+        <i class="el-icon-minus" @click="resizeMin"></i>
+        <i class="el-icon-more" @click="resizeMax"></i>
+        <i class="el-icon-close" @click="closeForm"></i>
+      </div>
+    </div>
     <el-row>
       <el-col :span='24'>
         <div class="content">
@@ -16,7 +23,7 @@
           @keyup.enter.native="loginIn('userInfo')"
           >
             <div style='text-align: center;'>
-              <span>KOI客户终端系统</span>
+              <span>KOI后台管理系统</span>
               <!-- <img src="../../../static/images/logo_bak.png" height="40px" width="200px" alt="logo"> -->
             </div>
             <h3 class="title">用户登录</h3>
@@ -35,7 +42,7 @@
             <el-col :span='5'>
               <el-form-item>
                 <el-tooltip class="item" effect="dark" content="记住密码" placement="bottom">
-                  <el-switch on-text="ON" off-text="OFF" v-model="remumber" off-color="#ff4949" @change="switchChecked"></el-switch>
+                  <el-switch v-model="remumber" @change="switchChecked"></el-switch>
                 </el-tooltip>
               </el-form-item>
             </el-col>
@@ -134,6 +141,16 @@ export default {
               this.loading = false;
               switch (res.data.Code) {
                  case 200:
+
+                 if(res.data.Data.UserType === 4) {
+                       this.$message({
+                          message: '您没有权限登录管理后台！',
+                          type: 'error'
+                        });
+
+                       return;
+                   }
+
                   if (this.remumber == true) {
                     localStorage.setItem('userInfo.password', this.userInfo.password);
                     sessionStorage.setItem('password', this.userInfo.password);
@@ -151,13 +168,13 @@ export default {
                   sessionStorage.setItem('remumber', this.remumber);
                   sessionStorage.setItem('userId', res.data.Data.Id);
                   this.$message({
-                    message: '欢迎登录KOI客戶系统',
+                    message: '欢迎登录KOI后台管理系统',
                     type: 'success'
                   });
 //                sessionStorage.setItem('userInfoIsA',!res.data.Data.IsSupperAdmin);
 //                sessionStorage.setItem('userInfoIsS',res.data.Data.IsSupperAdmin);
 //                console.log('Hello');
-                  this.$router.push({path:'/wrap/messageList',query:{}});
+                  this.$router.push({path:'/admin',query:{}});
 //                countRes = 0;
                   break;
                 case 34:
@@ -241,6 +258,29 @@ export default {
     reset(userInfo) {
       this.$refs[userInfo].resetFields();
     },
+    /**
+   * [resizeMin 下面是winform提供的窗口缩放方法]
+   * @Author   罗文
+   * @DateTime 2017-11-01
+   * @return   {[type]}   [description]
+   */
+    resizeMin() {
+      Minimize();
+    },
+    resizeMax() {
+      Maximize();
+    },
+    closeForm() {
+      this.$confirm('确认关闭?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+           Close();
+        }).catch(() => {
+      
+        });
+    },
   },
   mounted() {
     this.setLoginSize();
@@ -303,5 +343,32 @@ export default {
     font-size: 12px;
     color: red;
   }
+}
+
+.login-content-title {
+   border-bottom: none;
+   box-shadow: 0px 0px 0px #e9ecf3;
+   background: #e9ecf3;
+   -webkit-app-region: drag;
+}
+
+.content-title-right {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   height: 40px;
+   width: 140px;
+   -webkit-app-region: no-drag;
+   transition: all ease-in-out 0.3s;
+}
+
+.login-content-title:hover .content-title-right {
+   background: #0393e8;
+   color: white;
+}
+
+
+.content-title-right i:hover {
+  background: #2b579a
 }
 </style>
