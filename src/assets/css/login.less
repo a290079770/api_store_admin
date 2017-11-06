@@ -1,3 +1,14 @@
+.flex-center(@lineAlign,@verAlign) {
+  display: flex;
+  justify-content: @lineAlign;
+  align-items: @verAlign;
+}
+
 .login {
-  background: black
+  .flex-center(center,center);
+  background: black;
+  img {
+    cursor: pointer;
+    transition: all ease-in-out 0.3s;
+  }
 }
