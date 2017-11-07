@@ -6,8 +6,8 @@ import App from './App'
 
 import ElementUi from 'element-ui'
 Vue.use(ElementUi);
-import 'element-ui/lib/theme-chalk/index.css';
-// import '../theme/index.css';
+// import 'element-ui/lib/theme-chalk/index.css';
+import '../theme/index.css';
 //引入elementui组件库
 
 import axios from './http.js'

@@ -5,36 +5,43 @@
      </div>
      <el-row :style="{minHeight:winHeight +'px',height:'auto'}">
         <el-col :span="5" style="height:100%;position:relative;z-index:9">
-           <div class="side-bar-place">
+           <div class="side-bar-place" :style="{width: winWidth >= collapseSize ? '20.85%': 100 +'px'}">
              
            </div>
-           <div class="side-bar" style="height:100%">
+           <div class="side-bar" style="height:100%;background:transparent">
 
-             <div class="cover-img">
+             <div class="cover-img" v-show="winWidth >= collapseSize">
                 <h2 class="system-title">
                    KOI管理终端
                 </h2>
                 <div>
-                   <img src="../../assets/bg-big.jpg" alt="">
+                   <img src="../../assets/login-start.png" alt="">
                 </div>
                 <p></i>&nbsp;&nbsp;{{nickName}}</p>
                 <!-- <p><i class="el-icon-setting"></i>&nbsp;&nbsp;{{userType == 1 ? '系统管理员':(userType == 2 ? '二审专员':(userType == 3 ? '一审专员':'普通用户'))}}</p> -->
               </div>
 
               <el-menu 
-              default-active="0" 
-              class="el-menu-vertical-demo" 
-              @open="handleOpen" 
-              @close="handleOpen"
-              text-color="#fff"
-              background-color="#0393e8"
-              active-text-color="#fff"
+                default-active="0" 
+                class="el-menu-vertical-demo" 
+                @open="handleOpen" 
+                :collapse="winWidth >= collapseSize ?false : true"
+                text-color="#fff"
+                background-color="#21b384"
+                active-text-color="#fff"
               >
-                <span @click="toPath('/admin/investigate',1)"><el-menu-item index="0"><i class="el-icon-arrow-right"></i>一审</el-menu-item></span>
-                <span @click="toPath('/admin/investigate',2)"><el-menu-item index="1"><i class="el-icon-d-arrow-right"></i>二审</el-menu-item></span>
-                <span @click="toPath('/admin/review')"><el-menu-item index="2"><i class="el-icon-search"></i>查询</el-menu-item></span>
-                <span @click="toPath('/admin/systemLog')"><el-menu-item index="3"><i class="el-icon-tickets"></i>系统日志</el-menu-item></span>
-                <span @click="toPath('/admin/userAdmin')" v-show="userType == 1"><el-menu-item index="4"><i class="el-icon-edit"></i>用户管理</el-menu-item></span>
+
+                <span 
+                  @click="toPath(item.path,index+1)"
+                  v-for="(item,index) in path"
+                  >
+                  <el-menu-item :index="index + ''">
+                    <i :class="item.icon"></i>
+                    <span slot="title">{{item.title}}</span>
+                  </el-menu-item>
+                </span>
+
+
               </el-menu>
            </div>
         </el-col>
@@ -73,6 +80,34 @@
       return {
            winWidth:window.innerWidth,
            winHeight:window.innerHeight,
+           path:[
+             {
+               path:'/admin/investigate',
+               icon:'el-icon-arrow-right',
+               title:'一审'
+             },
+             {
+               path:'/admin/investigate',
+               icon:'el-icon-d-arrow-right',
+               title:'二审'
+             },
+             {
+               path:'/admin/review',
+               icon:'el-icon-search',
+               title:'查询'
+             },
+             {
+               path:'/admin/systemLog',
+               icon:'el-icon-tickets',
+               title:'系统日志'
+             },
+             {
+               path:'/admin/userAdmin',
+               icon:'el-icon-edit',
+               title:'用户管理'
+             },
+
+           ],
            toolsShow:false,
             tableData: [],
             tableData1: [],
@@ -80,7 +115,8 @@
             dialogVisible:false,
             aa:'',
             userType:4,
-            nickName:''
+            nickName:'',
+            collapseSize: 500
         }
      },
 
@@ -142,7 +178,7 @@
 
        },
        toPath(path,query) {
-         if(!query) {
+         if(query > 2) {
             this.$router.push(path);
          }else {
             this.$router.push({
@@ -230,9 +266,9 @@
    }
 </script>
 <style lang="css">
-   .side-bar {
-      background: #eef1f6;
-   }
+/*   .side-bar {
+      background: #21b384;
+   }*/
 
    .el-table__body-wrapper {
       overflow: hidden !important;
@@ -273,15 +309,11 @@
       z-index: 999;
    }
 
-   .side-bar {
-      background: #0393e8;
-   }
 
    .side-bar-place {
      position: fixed;
      height: 100%;
-     width: 20.85%;
-     background: #0393e8
+     background: #21b384
    }
 
    .el-table__body-wrapper {
@@ -368,5 +400,12 @@
    .el-menu-item i {
     color:white !important;
    }
+
+
+   .el-menu-vertical-demo:not(.el-menu--collapse) {
+    width: 100%;
+    min-height: 400px;
+    height: 100%;
+  }
 </style>
 
