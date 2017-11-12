@@ -8,6 +8,7 @@ export default new Router({
   routes: [{
       path: '/login',
       component: resolve => require(['@/components/login/Login_index'], resolve)
+      // component: resolve => require(['@/common/canvasTime'], resolve)
     }, 
     {
       path: '/admin',
@@ -19,27 +20,23 @@ export default new Router({
           next({ path: '/login' })
         }
       },
-      redirect:'/admin/investigate',
+      redirect:'/admin/index',
       children:[
          {
-            path: 'investtype',
-            component: resolve => require(['@/components/admin/investtype'], resolve),
+            path: 'index',
+            component: resolve => require(['@/components/admin/index'], resolve),
          },
          {
-            path: 'investigate',
-            component: resolve => require(['@/components/admin/investigate'], resolve),
+            path: 'products',
+            component: resolve => require(['@/components/admin/products'], resolve),
          },
          {
-            path: 'review',
-            component: resolve => require(['@/components/admin/review'], resolve),
+            path: 'users',
+            component: resolve => require(['@/components/admin/users'], resolve),
          },
          {
-            path: 'systemLog',
-            component: resolve => require(['@/components/admin/systemLog'], resolve),
-         },
-         {
-            path: 'userAdmin',
-            component: resolve => require(['@/components/admin/userAdmin'], resolve),
+            path: 'managers',
+            component: resolve => require(['@/components/admin/managers'], resolve),
          }
       ]
     },

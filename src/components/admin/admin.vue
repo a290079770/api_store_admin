@@ -12,10 +12,10 @@
 
              <div class="cover-img" v-show="winWidth >= collapseSize">
                 <h2 class="system-title">
-                   KOI管理终端
+                   API文档 <span style="font-size:14px">&nbsp;管理平台-Noven</span>
                 </h2>
                 <div>
-                   <img src="../../assets/login-start.png" alt="">
+                   <img src="../../assets/images/login-start.png" alt="">
                 </div>
                 <p></i>&nbsp;&nbsp;{{nickName}}</p>
                 <!-- <p><i class="el-icon-setting"></i>&nbsp;&nbsp;{{userType == 1 ? '系统管理员':(userType == 2 ? '二审专员':(userType == 3 ? '一审专员':'普通用户'))}}</p> -->
@@ -24,7 +24,6 @@
               <el-menu 
                 default-active="0" 
                 class="el-menu-vertical-demo" 
-                @open="handleOpen" 
                 :collapse="winWidth >= collapseSize ?false : true"
                 text-color="#fff"
                 background-color="#21b384"
@@ -43,142 +42,118 @@
 
 
               </el-menu>
+
            </div>
         </el-col>
         <el-col :span="19" :style="{minHeight:winHeight +'px',position:'relative'}">
            <div class="content-title">
-              <i class="el-icon-minus" @click="resizeMin"></i>
-              <i class="el-icon-more" @click="resizeMax"></i>
-              <i class="el-icon-close" @click="closeForm"></i>
+              <el-dropdown trigger="click">
+                <span class="el-dropdown-link">
+                  <i class="icon-my-user"></i>罗文
+                </span>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item>修改密码</el-dropdown-item>
+                  <el-dropdown-item>修改个人资料</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+              <i class="icon-my-tuichu1"  style="font-size:16px" @click="signOut"></i> <span class="sign-out">退出</span>
            </div>
            <el-row :style="{height:winHeight-45 +'px',marginTop:'40px'}">
-                <img src="../../assets/背景图1.png" class="background-img left-top" :style="{top:'0'}" alt="">
-                <img src="../../assets/背景图2.png" class="background-img right-bottom" alt="">
+                <img src="../../assets/images/背景图1.png" class="background-img left-top" :style="{top:'0'}" alt="">
+                <img src="../../assets/images/背景图2.png" class="background-img right-bottom" alt="">
                 <router-view></router-view>
+
+                <div class="canvas-content" :style="{width:cWidth + 'px'}">
+                   <canvas-time
+                    :cWidth="cWidth" 
+                    :cHeight="cHeight"
+                    :radius="radius"
+                    :marTop="5"
+                    :marLeft="0"
+                    :ballColor="ballColor"
+                   ></canvas-time>
+                </div>
            </el-row>
         </el-col>
      </el-row>
 
-
-     <el-dialog
-        title="驳回理由"
-        :visible.sync="dialogVisible"
-        width="60%"
-        :before-close="handleClose">
-        <el-input v-model="aa" type="textarea" auto-complete="off" placeholder="请输入驳回理由"></el-input>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="dialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-        </span>
-      </el-dialog>
   </div>
 </template>
 
 <script>
+   import {mapActions,mapGetters} from 'vuex';
+   import canvasTime from '../../common/canvasTime';
    export default {
      data(){
       return {
-           winWidth:window.innerWidth,
-           winHeight:window.innerHeight,
            path:[
              {
-               path:'/admin/investigate',
-               icon:'el-icon-arrow-right',
-               title:'一审'
+               path:'/admin/index',
+               icon:'icon-my-15',
+               title:'首页'
              },
              {
-               path:'/admin/investigate',
-               icon:'el-icon-d-arrow-right',
-               title:'二审'
+               path:'/admin/products',
+               icon:'icon-my-personal-center',
+               title:'产品列表'
              },
              {
-               path:'/admin/review',
-               icon:'el-icon-search',
-               title:'查询'
+               path:'/admin/users',
+               icon:'icon-my-users',
+               title:'用户列表'
              },
              {
-               path:'/admin/systemLog',
-               icon:'el-icon-tickets',
-               title:'系统日志'
+               path:'/admin/managers',
+               icon:'icon-my-guanliyuan',
+               title:'管理员列表'
              },
              {
-               path:'/admin/userAdmin',
-               icon:'el-icon-edit',
-               title:'用户管理'
+               path:'/login',
+               icon:'icon-my-tuichu1',
+               title:'退出'
              },
-
            ],
-           toolsShow:false,
-            tableData: [],
-            tableData1: [],
-            tableData2: [],
-            dialogVisible:false,
-            aa:'',
-            userType:4,
+
             nickName:'',
-            collapseSize: 500
+            collapseSize: 500,
+
+            cWidth : 240,   //画布宽
+            cHeight : 80,
+            radius : 1.2,
+            marTop : 50,
+            marLeft : 0,
+            ballColor:"#fff"
         }
+     },
+
+     computed:mapGetters([
+      'winWidth',
+      'winHeight'
+     ]),
+
+     components:{
+       'canvas-time':canvasTime
      },
 
      methods:{
        setWindow() {
-           this.winWidth = window.innerWidth;
-           this.winHeight = window.innerHeight;
-       },
-       /**
-        * [getExplicitWordList 获取管理端列表数据]
-        * @Author   罗文
-        * @DateTime 2017-10-19
-        * @param    {[Boolean]}   isshenhe [传入''，获取所有  true - 已审核  false - 未审核]
-        * @return   {[type]}     [description]
-        */
-       getExplicitWordList(isshenhe) {
-          this.$http.get('/ExplicitWord/List',{
-            params:{
-              isFormal:isshenhe
-            }
-          }).then((res) => {
-            if (res.data.Code == 200) {
-               switch (isshenhe) {
-                 case '':
-                   this.tableData = res.data.Data.ItemList;
-                   break;
-                 case false:
-                   this.tableData1 = res.data.Data.ItemList;
-                   break;
-                 case true:
-                   this.tableData2 = res.data.Data.ItemList;
-                   break;  
-                 default:
-                   // statements_def
-                   break;
-               }
-            }else {
-               this.$message({
-                  message: res.data.Description,
-                  type: 'error'
-               });
-            }
-          })
-       },
-       handleOpen(key, keyPath) {
-        switch(key) {
-           case '1':
-             this.$router.push('/admin/investtype');
-             break;
-           case '2':
-             this.$router.push('/admin/review');
-             break;
-           case '3':
-             this.$router.push('/admin/reView');
-             break;  
-           default:
-             break;
-         }
-
+           this.$store.dispatch('setWindow',{
+              winWidth:window.innerWidth,
+              winHeight:window.innerHeight
+            });
        },
        toPath(path,query) {
-         if(query > 2) {
+        if(query  ==  this.path.length) {
+            this.$confirm('确定退出?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => {
+              this.$router.push(path);
+            }).catch(() => {
+          
+            });
+         }else if(query > 2) {
             this.$router.push(path);
          }else {
             this.$router.push({
@@ -189,76 +164,28 @@
             })
          }
        },
-       handleClose(key, keyPath) {
-        console.log(key, keyPath);
-       },
-       handleEdit(index, row) {
-         this.$confirm('审核通过?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
-            this.$message({
-              type: 'success',
-              message: '审核通过(功能演示)！'
-            });
-          }).catch(() => {
-        
-          });
-       },
-       handleDelete(index, row) {
-          this.$confirm('确认驳回?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
-            this.$message({
-              type: 'success',
-              message: '已驳回(功能演示)！'
-            });
-          }).catch(() => {
-        
-          });
-       },
-      handleClose(done) {
-        this.$confirm('确认关闭？')
-          .then(_ => {
-            done();
-          })
-          .catch(_ => {});
-      },
+
       
       /**
-       * [resizeMin 下面是winform提供的窗口缩放方法]
+       * [signOut 退出系统]
        * @Author   罗文
        * @DateTime 2017-11-01
        * @return   {[type]}   [description]
        */
-      resizeMin() {
-        Minimize();
-      },
-      resizeMax() {
-        Maximize();
-      },
-      closeForm() {
-        this.$confirm('确认关闭?', '提示', {
+      signOut() {
+        this.$confirm('确定退出?', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
-             Close();
+            this.$router.push('/login');
           }).catch(() => {
         
           });
-      },
+      }
      },
      mounted() {
-        this.userType = sessionStorage.userType;
-        this.nickName = sessionStorage.nickname;
         this.setWindow();
-        // this.getExplicitWordList('');
-        // this.getExplicitWordList(true);
-        // this.getExplicitWordList(false);
         window.onresize = ()=>{
            this.setWindow();
         }
@@ -266,146 +193,6 @@
    }
 </script>
 <style lang="css">
-/*   .side-bar {
-      background: #21b384;
-   }*/
 
-   .el-table__body-wrapper {
-      overflow: hidden !important;
-   }
-
-   .cover-img {
-      width:100%;
-      height:200px;
-      overflow: hidden;
-   }
-
-   .cover-img img {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100px;
-      height: 100px;
-      /*background: green;*/
-      border-radius: 50%;
-      margin: 20px 30px 0;
-   }
-
-/*   .cover-img div img {
-      width: 100%;
-      height: 100%;
-   }
-*/
-   .cover-img p {
-      margin: 10px 25px;
-      color:#337ab7;
-   }
-
-   .place-holder {
-      border:1px solid #eee;
-      position:fixed;
-      left:0;
-      top:0;
-      z-index: 999;
-   }
-
-
-   .side-bar-place {
-     position: fixed;
-     height: 100%;
-     background: #21b384
-   }
-
-   .el-table__body-wrapper {
-      overflow: hidden !important;
-   }
-
-   .el-menu {
-      border-right: none !important;
-   }
-
-
-   .el-menu-item,.el-submenu__title {
-      padding-left: 18% !important;
-      font-size: 16px !important;
-
-   }
-
-/*   .el-menu-item li {
-     padding-left:80px !important;
-   }*/
-
-   .place-span {
-    display: inline-block;
-    width: 28px;
-
-   }
-
-
-
-   .cover-img {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      position: relative;
-      z-index: 10;
-      width:100%;
-      height:200px;
-      overflow: hidden;
-   }
-
-   .system-title {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 60px;
-      color:white;
-      font: normal 20px '微软雅黑';
-      align-self: flex-start;
-      padding-left: 20px;
-   }
-
-   .cover-img img {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100px;
-      height: 100px;
-      /*background: green;*/
-      border-radius: 50%;
-      margin: 20px 30px 0;
-   }
-
-/*   .cover-img div img {
-      width: 100%;
-      height: 100%;
-   }
-*/
-   .cover-img p {
-      margin: 10px 25px;
-      color:white;
-      /*padding-left: 25px;*/
-   }
-
-   .place-holder {
-      border:1px solid #eee;
-      position:fixed;
-      left:0;
-      top:0;
-      z-index: 999;
-   }
-
-
-   .el-menu-item i {
-    color:white !important;
-   }
-
-
-   .el-menu-vertical-demo:not(.el-menu--collapse) {
-    width: 100%;
-    min-height: 400px;
-    height: 100%;
-  }
 </style>
 

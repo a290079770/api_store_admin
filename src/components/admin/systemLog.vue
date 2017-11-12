@@ -28,7 +28,7 @@
           width="180"
           align="center"
           >
-          <template scope="scope">
+          <template slot-scope="scope">
              {{scope.row.UserName ? scope.row.UserName : '暂无信息'}}
           </template>
         </el-table-column>
@@ -37,7 +37,7 @@
           width="180"
           align="center"
           >
-          <template scope="scope">
+          <template slot-scope="scope">
              {{renderActionType(scope.row.ActionType)}}
           </template>
         </el-table-column>

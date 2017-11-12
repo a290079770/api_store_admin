@@ -1,5 +1,11 @@
 <template>
   <div class="index-cont" :style="{height:winHeight +'px',width: '92%',margin:'30px auto'}">
+    <div class="table-page-title">
+       <h3>
+         管理员管理
+       </h3>
+       <span class="yellow-place"></span>
+     </div>
     <el-row>
         <el-col :span="18" >&nbsp;</el-col>
 
@@ -40,7 +46,7 @@
           width="180"
           align="center"
           >
-          <template scope="scope">
+          <template slot-scope="scope">
              {{scope.row.UserType == 2 ? "专家" :""}}
              {{scope.row.UserType == 3 ? "管理员" :""}}
              {{scope.row.UserType == 4 ? "用户" :""}}
@@ -49,7 +55,7 @@
                 <el-table-column
                   prop="address"
                   label="操作">
-                  <template scope="scope">
+                  <template slot-scope="scope">
                     <el-button
                       size="small"
                       @click="handleUpdateUser(scope.$index, scope.row)">修改</el-button>  
@@ -135,8 +141,10 @@
      },
      methods:{
        setWindow() {
-           this.winWidth = window.innerWidth;
-           this.winHeight = window.innerHeight;
+           this.$store.dispatch('setWindow',{
+              winWidth:window.innerWidth,
+              winHeight:window.innerHeight
+            });
        },
        handleUpdateUser(index,row){
            this.dialogVisible = true;

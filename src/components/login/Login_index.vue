@@ -9,7 +9,7 @@
        欢迎登陆NOVEN的专属API管理后台
      </h1>
      <img 
-     src="../../assets/login-start.png"  
+     src="../../assets/images/login-start.png"  
      :width="imgWidth"
      :style="{left:imgLeft + '%'}"
      class="login-start" 
@@ -60,7 +60,7 @@
             <el-col :span='loading?2:5'>
               <el-form-item>
                 <el-tooltip class="item" effect="dark" content="记住密码" placement="bottom">
-                  <el-switch v-model="remumber" @change="switchChecked"></el-switch>
+                  <el-switch v-model="remember" ></el-switch>
                 </el-tooltip>
               </el-form-item>
             </el-col>
@@ -122,7 +122,7 @@ export default {
         width: '',
         height: ''
       },
-      remumber: eval(sessionStorage.getItem('remumber')) || eval(localStorage.getItem('remumber')),
+      remember: eval(sessionStorage.getItem('remember')) || eval(localStorage.getItem('remember')),
       rule_data: {
         username: [{
           required: true,
@@ -246,21 +246,27 @@ export default {
     },
 
     /**
-     * [imgAnimation1 图片动画2，用作登录动画]
+     * [setLoginFormData 回显时设置表单数据]
      * @Author   罗文
-     * @DateTime 2017-11-06
-     * @return   {[type]}   [description]
+     * @DateTime 2017-11-12
      */
-    imgAnimation2() {
+    setLoginFormData() {
+       //设置是否记住密码
+       let remember = localStorage.getItem('remember') || 'false';
+       if(remember != 'true' && remember != 'false') remember = 'false';
+
+       this.remember = eval(remember);
+
+       //设置账号输入框
+       this.userInfo.username  = localStorage.getItem('account') || '';
+
+       //设置密码，根据上次用户的记录情况
+       if(this.remember) {
+          this.userInfo.password = localStorage.getItem('password') || '';
+       }
        
     },
 
-
-    //切换是否记住密码功能
-    switchChecked() {
-      localStorage.setItem('remumber', !this.remumber);
-      sessionStorage.setItem('remumber', !this.remumber);
-    },
 
     //登录系统
     loginIn(userInfo) {
@@ -268,124 +274,49 @@ export default {
       this.$refs[userInfo].validate((valid) => {
         if (valid) {
 
-          var activePwd = sessionStorage.getItem('password') ? sessionStorage.getItem('password') : (localStorage.getItem('userInfo.password') ? localStorage.getItem('userInfo.password') : '');
+          var activePwd = localStorage.getItem('password') ? localStorage.getItem('password') : '';
 
           if (this.userInfo.password !== activePwd) {
             this.userInfo.password = hex_sha1(this.userInfo.password);
           }
           this.loading = true;
-          this.$http.post('/passport/login?random=' + Math.random(), this.userInfo)
-            .then((res) => {
+
+          this.userInfo.random = Math.random();
+          
+          //登录
+          this.apiTransfer('post','/passport/login',this.userInfo,(res)=>{
               this.loading = false;
-              switch (res.data.Code) {
-                 case 200:
+              if(res.data.Code == 200) {
 
-                 if(res.data.Data.UserType === 4) {
-                       this.$message({
-                          message: '您没有权限登录管理后台！',
-                          type: 'error'
-                        });
-
-                       return;
-                   }
-
-                  if (this.remumber == true) {
-                    localStorage.setItem('userInfo.password', this.userInfo.password);
-                    sessionStorage.setItem('password', this.userInfo.password);
+                  //永久存储用于记录密码
+                  if (this.remember == true) {
+                    localStorage.setItem('password', this.userInfo.password);
                   } else {
-                    localStorage.removeItem('userInfo.password');
-                    sessionStorage.removeItem('password');
+                    localStorage.removeItem('password');
                   }
-                  localStorage.setItem('userInfo.username', this.userInfo.username);
-//                localStorage.setItem('userInfo.nickname', res.data.Data.NickName);
-                  localStorage.setItem('userInfo.nickname', "张三");
-                  localStorage.setItem('userInfo.UserType', res.data.Data.UserType);
-                  sessionStorage.setItem('userType',  res.data.Data.UserType);
-                  sessionStorage.setItem('nickname',  res.data.Data.RealName);
-                  sessionStorage.setItem('username', this.userInfo.username);
-                  sessionStorage.setItem('remumber', this.remumber);
+                 
+                  localStorage.setItem('account', this.userInfo.username);
+                  localStorage.setItem('remember', this.remember);
+                  
+                  //临时存储用于保存用户信息
+                  sessionStorage.setItem('userInfo', JSON.stringify(res.data.Data));
                   sessionStorage.setItem('userId', res.data.Data.Id);
+
+
                   this.$message({
                     message: '欢迎登录KOI后台管理系统',
                     type: 'success'
                   });
-//                sessionStorage.setItem('userInfoIsA',!res.data.Data.IsSupperAdmin);
-//                sessionStorage.setItem('userInfoIsS',res.data.Data.IsSupperAdmin);
-//                console.log('Hello');
+
                   this.$router.push({path:'/admin',query:{}});
-//                countRes = 0;
-                  break;
-                case 34:
-                  return;
-                  break;
-                case 22:
-                  if (res.data.Description.indexOf('手机') !== -1) {
-                    this.$message({
-                      message: res.data.Description,
-                      type: 'error',
-                      duration: 2000,
-                      onClose: () => {
-                        this.userInfo.username = ''
-                      }
-                    })
-                  } else if (res.data.Description.indexOf('密码') !== -1) {
-                    this.$message({
-                      message: res.data.Description,
-                      type: 'error',
-                      duration: 2000,
-                      onClose: () => {
-                        this.userInfo.password = ''
-                      }
-                    })
-                  } else if (res.data.Description.indexOf('权限') !== -1) {
-                    this.$message({
-                      message: res.data.Description,
-                      type: 'error',
-                      duration: 2000,
-                      onClose: () => {
-                        this.userInfo.password = ''
-                      }
-                    })
-                  }else if (res.data.Description.indexOf('注册') !== -1) {
-                    this.$message({
-                      message: res.data.Description,
-                      type: 'error',
-                      duration: 2000,
-                      onClose: () => {
-                        this.userInfo.username = '',
-                        this.userInfo.password = ''
-                      }
-                    })
-                  }
-                  break;
-                case 32:
-                  this.$confirm('该用户已被锁定，请联系管理员进行解锁！', '提示', {
-                    confirmButtonText: '确定',
-                    showCancelButton: false,
+              }else {
+                  this.$message({
+                    message: res.data.Description,
                     type: 'error'
-                  })
-                  break;
-                case 16:
-                  this.$confirm('账号或密码错误！', '提示', {
-                    confirmButtonText: '确定',
-                    showCancelButton: false,
-                    type: 'error'
-                  })
-                  break;
-                case 33:
-                  this.$confirm('该用户还未激活，请先联系管理员进行激活！', '提示', {
-                    confirmButtonText: '确定',
-                    showCancelButton: false,
-                    type: 'error'
-                  })
-                  break;
-                default:
-                  break;
+                  });
               }
-            })
-            .catch((err) => {
-              console.log(err)
-            })
+          });
+ 
         } else {
           return false;
         }
@@ -407,12 +338,20 @@ export default {
     this.headTopAnimate();
     setTimeout(()=>{
       this.imgAnimation1();
-    }, 800)
+    }, 800);
+
+    
+    //回显，设置表单数据
+    this.setLoginFormData();
   },
 
   watch:{
     'winWidth':function(nv) {
        this.imgWidth = this.imgLeft == -30 ? nv/10 : nv/5;
+    },
+
+    'remember':function(nv) {
+        localStorage.setItem('remember', nv);
     }
   }
 }

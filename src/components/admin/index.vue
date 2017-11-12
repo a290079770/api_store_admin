@@ -2,7 +2,7 @@
   <div style="margin:30px auto;width:92%;">
      <div class="table-page-title">
        <h3>
-         {{investType==1 ? '一审':'二审'}}
+         首页
        </h3>
        <span class="yellow-place"></span>
      </div>
@@ -39,21 +39,21 @@
             prop="Title"
             label="类型"
             >
-            <template scope="scope">
+            <template slot-scope="scope">
                {{scope.row.ObjectType == 1? '知识元' : (scope.row.ObjectType == 2? '知识簇':'知识链')}}
             </template>
           </el-table-column>
           <el-table-column
             label="申请类型"
             >
-            <template scope="scope">
+            <template slot-scope="scope">
                {{scope.row.ActionType == 1 ? '新增' : (scope.row.ActionType == 2? '修改':'注销')}}
             </template>
           </el-table-column>
           <el-table-column
             prop="address"
             label="审核状态">
-            <template scope="scope">
+            <template slot-scope="scope">
                {{investType == 1 ? '一审中' : '二审中'}}
             </template>
           </el-table-column>
@@ -62,7 +62,7 @@
             label="操作"
             width="300px"
             >
-            <template scope="scope">
+            <template slot-scope="scope">
 
               <el-button
                 size="small"
@@ -124,8 +124,6 @@
    export default {
      data(){
       return {
-           winWidth:window.innerWidth,
-           winHeight:window.innerHeight,
            toolsShow:false,
             tableData: [],
             tableData1: [],
@@ -150,8 +148,10 @@
        },
      methods:{
        setWindow() {
-           this.winWidth = window.innerWidth;
-           this.winHeight = window.innerHeight;
+           this.$store.dispatch('setWindow',{
+              winWidth:window.innerWidth,
+              winHeight:window.innerHeight
+            });
        },
        /**
         * [canBtnsUse 列表的操作按钮是否可用]

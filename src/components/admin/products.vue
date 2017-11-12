@@ -1,5 +1,11 @@
 <template>
   <div class="index-cont" :style="{width: '92%',margin:'30px auto'}">
+    <div class="table-page-title">
+       <h3>
+         产品管理
+       </h3>
+       <span class="yellow-place"></span>
+     </div>
     <el-row>
         <el-col :span="18" >&nbsp;</el-col>
 <!--         <el-col :span="12" >
@@ -44,20 +50,20 @@
         <el-table-column
           label="类型"
           width="180">
-          <template scope="scope">
+          <template slot-scope="scope">
              {{scope.row.ObjectType ? (scope.row.ObjectType == 1 ? '知识元':(scope.row.ObjectType == 2 ? '知识簇' :'知识链')): '暂无信息' }}
           </template>
         </el-table-column>
         <el-table-column
           label="审核状态">
-          <template scope="scope">
+          <template slot-scope="scope">
              {{'已审核'}}
           </template>
         </el-table-column>
         <el-table-column
           prop="KoiNumber"
           label="KOI编码">
-          <template scope="scope">
+          <template slot-scope="scope">
               {{scope.row.KoiNumber ? scope.row.KoiNumber : '未通过审核'}}
           </template>
         </el-table-column>
@@ -83,8 +89,8 @@
    export default {
      data(){
       return {
-           winWidth:window.innerWidth,
-           winHeight:window.innerHeight,
+           // winWidth:window.innerWidth,
+           // winHeight:window.innerHeight,
            toolsShow:false,
             tableData: [],
             tableData1: [],
@@ -99,10 +105,13 @@
             totalCount: 0,
         }
      },
+
      methods:{
        setWindow() {
-           this.winWidth = window.innerWidth;
-           this.winHeight = window.innerHeight;
+           this.$store.dispatch('setWindow',{
+              winWidth:window.innerWidth,
+              winHeight:window.innerHeight
+            });
        },
        /**
         * [getExplicitWordList 获取管理端列表数据]
@@ -111,23 +120,21 @@
         * @return   {[type]}     [description]
         */
        getExplicitWordList() {
-          this.$http.get('/KoiNumber/List',{
-            params:{
+          this.apiTransfer('get','/KoiNumber/List',{
                ps:this.pageCount,
                cp:this.currentPage,
                keyword:this.keyword
-            }
-          }).then((res) => {
-            if (res.data.Code == 200) {
-               this.tableData = res.data.Data.ItemList;
-               this.totalCount = res.data.Data.RecordCount;
-            }else {
-               this.$message({
-                  message: res.data.Description,
-                  type: 'error'
-               });
-            }
-          })
+            },(res)=>{
+               if (res.data.Code == 200) {
+                   this.tableData = res.data.Data.ItemList;
+                   this.totalCount = res.data.Data.RecordCount;
+                }else {
+                   this.$message({
+                      message: res.data.Description,
+                      type: 'error'
+                   });
+                }
+            })
        },
        handleOpen(key, keyPath) {
         console.log(typeof key);

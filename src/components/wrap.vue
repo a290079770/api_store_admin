@@ -7,7 +7,7 @@
         <el-col :span="4" >
             <div class="cover-img">
               <div>
-                 <img src="../../assets/n1.png" alt="">
+                 <img src="../../assets/images/n1.png" alt="">
               </div>
               <p><i class="el-icon-edit"></i>&nbsp;张三</p>
               <p><i class="el-icon-setting"></i>&nbsp;系统管理员</p>
