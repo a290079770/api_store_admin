@@ -7,11 +7,15 @@
        <span class="yellow-place"></span>
      </div>
     <el-row>
-        <el-col :span="18" >&nbsp;</el-col>
+        <el-col :span="18" >
+          <el-button
+          size="success"
+          @click="openAddUsersDialog" icon="el-icon-plus">新增管理员</el-button>
+        </el-col>
 
         <el-col :span="6" >
             <el-input 
-              placeholder="请输入用户名查找" 
+              placeholder="请输入管理员账号或昵称查找" 
               suffix-icon="el-icon-search" 
               v-model="keyWord" 
               @keyup.enter.native="handleIconClick"
@@ -24,11 +28,6 @@
       :data="tableData"
       :border="true"
       style="margin-top:30px">
-        <el-table-column
-          prop="Id"
-          label="Id"
-          width="80">
-        </el-table-column>
         <el-table-column
         	prop='RealName'
           label="用户名"
@@ -58,42 +57,40 @@
                   <template slot-scope="scope">
                     <el-button
                       size="small"
-                      @click="handleUpdateUser(scope.$index, scope.row)">修改</el-button>  
+                      @click="handleUpdateUser(scope.$index, scope.row)">重置密码</el-button>  
                     <el-button
                       size="small"
-                      :type="scope.row.State == 1 ? 'danger':'success'"
-                      @click="handleDelete(scope.$index, scope.row)">{{scope.row.State == 1 ? '停用':'启用'}}</el-button>
+                      type="danger"
+                      @click="handleDelete(scope.$index, scope.row)">
+                      删除
+                    </el-button>
                   </template>
                 </el-table-column>
     </el-table>
     
     
      <el-dialog
-        title="编辑用户信息"
+        title="新增管理员"
         :visible.sync="dialogVisible"
         width="60%"
         >
-        <el-form :label-position="labelPosition" label-width="80px" :model="formLabelAlign">
-          <el-form-item label="用户名">
-            <el-input v-model="formLabelAlign.RealName" placeholder="请输入用户名"></el-input>
+        <el-form :label-position="labelPosition" ref="addUsers" label-width="120px" :model="formLabelAlign">
+          <el-form-item label="账号" prop="username">
+            <el-input v-model="formLabelAlign.RealName" placeholder="请输入管理员账号" class="input-width" ></el-input>
           </el-form-item>
 
-          <el-form-item label="密码">
-            <el-input v-model="formLabelAlign.Password" type="password" placeholder="请输入帐号/手机号"></el-input>
+          <el-form-item label="密码" prop="password">
+            <el-input v-model="formLabelAlign.Password" type="password" placeholder="请输入管理员密码" class="input-width"></el-input>
           </el-form-item>
 
-          <el-form-item label="用户类型">
-            <el-select v-model="formLabelAlign.UserType">
-              <el-option label="专家" value="2"></el-option>
-              <el-option label="管理员" value="3"></el-option>
-              <el-option label="用户" value="4"></el-option>
-            </el-select>
+          <el-form-item label="确认密码" prop="confirmPwd">
+            <el-input v-model="formLabelAlign.Password" type="password" placeholder="请再次确认密码" class="input-width"></el-input>
           </el-form-item>
 
         </el-form>
         <span slot="footer" class="dialog-footer">
           <el-button @click="dialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="handleUpdate">确 定</el-button>
+          <el-button type="primary" @click="handleAddUsers">确 定</el-button>
         </span>
       </el-dialog>
 
@@ -140,12 +137,6 @@
         }
      },
      methods:{
-       setWindow() {
-           this.$store.dispatch('setWindow',{
-              winWidth:window.innerWidth,
-              winHeight:window.innerHeight
-            });
-       },
        handleUpdateUser(index,row){
            this.dialogVisible = true;
            this.formLabelAlign = {
@@ -227,43 +218,25 @@
        },
 
        /**
-        * [handleUpdate 修改用户]
+        * [openAddUsersDialog 打开新增用户框]
         * @Author   罗文
         * @DateTime 2017-10-30
         * @return   {[type]}   [description]
         */
-       handleUpdate(){
-            this.formLabelAlign.Password = hex_sha1(this.formLabelAlign.Password);
-            switch (this.formLabelAlign.UserType) {
-              case '专家':
-                this.formLabelAlign.UserType = 2;
-                break;
-              case '管理员':
-                this.formLabelAlign.UserType = 3;
-                break;
-              case '用户':
-                this.formLabelAlign.UserType = 4;
-                break;    
-              default:
-                // statements_def
-                break;
-            }
+       openAddUsersDialog(){
+        this.dialogVisible = true;
+    
+       },
 
-          	this.$http.post('/User/Update',this.formLabelAlign).then((res) => {
-              if (res.data.Code == 200) {
-                 this.getExplicitWordList();
-                 this.$message({
-                    message: '修改成功！',
-                    type: 'success'
-                  });
-                 this.dialogVisible = false;
-              }else {
-                 this.$message({
-                    message: res.data.Description,
-                    type: 'error'
-                  });
-                }
-             })
+      /**
+        * [handleAddUsers 新增用户]
+        * @Author   罗文
+        * @DateTime 2017-10-30
+        * @return   {[type]}   [description]
+        */
+       handleAddUsers(){
+        this.dialogVisible = false;
+    
        },
        
       //搜索
@@ -298,12 +271,12 @@
       },
      },
      mounted() {
-        this.setWindow();
+        this.setWindow(window.innerWidth,window.innerHeight);
         this.getExplicitWordList('');
         this.getExplicitWordList(true);
         this.getExplicitWordList(false);
         window.onresize = ()=>{
-           this.setWindow();
+           this.setWindow(window.innerWidth,window.innerHeight);
         }
      }
    }

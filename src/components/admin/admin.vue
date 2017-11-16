@@ -48,7 +48,7 @@
         <el-col :span="19" :style="{minHeight:winHeight +'px',position:'relative'}">
            <div class="content-title">
               <el-dropdown trigger="click">
-                <span class="el-dropdown-link">
+                <span class="el-dropdown-link" style="cursor:pointer">
                   <i class="icon-my-user"></i>罗文
                 </span>
                 <el-dropdown-menu slot="dropdown">
@@ -136,12 +136,7 @@
      },
 
      methods:{
-       setWindow() {
-           this.$store.dispatch('setWindow',{
-              winWidth:window.innerWidth,
-              winHeight:window.innerHeight
-            });
-       },
+       
        toPath(path,query) {
         if(query  ==  this.path.length) {
             this.$confirm('确定退出?', '提示', {
@@ -153,15 +148,8 @@
             }).catch(() => {
           
             });
-         }else if(query > 2) {
-            this.$router.push(path);
          }else {
-            this.$router.push({
-              path:path,
-              query:{
-                 investType:query
-              }
-            })
+            this.$router.push(path);
          }
        },
 
@@ -185,9 +173,9 @@
       }
      },
      mounted() {
-        this.setWindow();
+        this.setWindow(window.innerWidth,window.innerHeight);
         window.onresize = ()=>{
-           this.setWindow();
+           this.setWindow(window.innerWidth,window.innerHeight);
         }
      }
    }

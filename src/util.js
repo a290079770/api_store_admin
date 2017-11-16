@@ -1,5 +1,7 @@
 import Vue from 'vue';
 import axios from './http.js'
+import store from './store/index.js'
+
 Vue.prototype.$http = axios;
 
 export default {
@@ -29,6 +31,22 @@ export default {
             }
           })
     };
+
+    
+    /**
+     * [setWindow 设置系统的宽高]
+     * @Author   罗文
+     * @DateTime 2017-11-13
+     * @param    {[type]}   width  [宽度]
+     * @param    {[type]}   height [高度]
+     */
+    Vue.prototype.setWindow = function(width,height) {
+       store.dispatch('setWindow',{
+          winWidth:width,
+          winHeight:height
+       });
+    }
+
 
 
   }

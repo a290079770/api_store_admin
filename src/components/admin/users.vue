@@ -7,11 +7,15 @@
        <span class="yellow-place"></span>
      </div>
     <el-row>
-        <el-col :span="18" >&nbsp;</el-col>
+        <el-col :span="18" >
+          <el-button
+          size="success"
+          @click="openAddUsersDialog" icon="el-icon-plus">新增用户</el-button>
+        </el-col>
 
         <el-col :span="6" >
             <el-input 
-              placeholder="请输入用户名查找" 
+              placeholder="请输入用户账号或昵称查找" 
               suffix-icon="el-icon-search" 
               v-model="keyWord" 
               @keyup.enter.native="handleIconClick"
@@ -24,11 +28,6 @@
       :data="tableData"
       :border="true"
       style="margin-top:30px">
-        <el-table-column
-          prop="Id"
-          label="Id"
-          width="80">
-        </el-table-column>
         <el-table-column
         	prop='RealName'
           label="用户名"
@@ -52,48 +51,46 @@
              {{scope.row.UserType == 4 ? "用户" :""}}
           </template>
         </el-table-column>
-                <el-table-column
-                  prop="address"
-                  label="操作">
-                  <template slot-scope="scope">
-                    <el-button
-                      size="small"
-                      @click="handleUpdateUser(scope.$index, scope.row)">修改</el-button>  
-                    <el-button
-                      size="small"
-                      :type="scope.row.State == 1 ? 'danger':'success'"
-                      @click="handleDelete(scope.$index, scope.row)">{{scope.row.State == 1 ? '停用':'启用'}}</el-button>
-                  </template>
-                </el-table-column>
+        <el-table-column
+          prop="address"
+          label="操作">
+          <template slot-scope="scope">
+            <el-button
+              size="small"
+              @click="handleResetPwd(scope.$index, scope.row)">重置密码</el-button>   
+            <el-button
+              size="small"
+              :type="scope.row.State == 1 ? 'danger':'success'"
+              @click="handleChangeState(scope.$index, scope.row)">{{scope.row.State == 1 ? '停用':'启用'}}</el-button>
+            
+          </template>
+        </el-table-column>
     </el-table>
     
     
      <el-dialog
-        title="编辑用户信息"
+        title="新增用户"
         :visible.sync="dialogVisible"
+        top="20vh"
         width="60%"
         >
-        <el-form :label-position="labelPosition" label-width="80px" :model="formLabelAlign">
-          <el-form-item label="用户名">
-            <el-input v-model="formLabelAlign.RealName" placeholder="请输入用户名"></el-input>
+        <el-form :label-position="labelPosition" ref="addUsers" label-width="120px" :model="formLabelAlign">
+          <el-form-item label="用户名" prop="username">
+            <el-input v-model="formLabelAlign.RealName" placeholder="请输入用户名" class="input-width" ></el-input>
           </el-form-item>
 
-          <el-form-item label="密码">
-            <el-input v-model="formLabelAlign.Password" type="password" placeholder="请输入帐号/手机号"></el-input>
+          <el-form-item label="密码" prop="password">
+            <el-input v-model="formLabelAlign.Password" type="password" placeholder="请输入用户密码" class="input-width"></el-input>
           </el-form-item>
 
-          <el-form-item label="用户类型">
-            <el-select v-model="formLabelAlign.UserType">
-              <el-option label="专家" value="2"></el-option>
-              <el-option label="管理员" value="3"></el-option>
-              <el-option label="用户" value="4"></el-option>
-            </el-select>
+          <el-form-item label="确认密码" prop="confirmPwd">
+            <el-input v-model="formLabelAlign.Password" type="password" placeholder="请再次确认密码" class="input-width"></el-input>
           </el-form-item>
 
         </el-form>
         <span slot="footer" class="dialog-footer">
           <el-button @click="dialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="handleUpdate">确 定</el-button>
+          <el-button type="primary" @click="openAddUsersDialog">确 定</el-button>
         </span>
       </el-dialog>
 
@@ -140,57 +137,58 @@
         }
      },
      methods:{
-       setWindow() {
-           this.$store.dispatch('setWindow',{
-              winWidth:window.innerWidth,
-              winHeight:window.innerHeight
-           });
-       },
-       handleUpdateUser(index,row){
-           this.dialogVisible = true;
-           this.formLabelAlign = {
-                UserId:row.Id,
-                RealName: row.RealName,
-                Password: '',
-                UserType: row.UserType == 2 ?"专家":(row.UserType == 3 ? "管理员":'用户')
-           }
+
+       handleResetPwd(index,row){
+           this.$confirm('是否将该用户密码重置为 123456 ?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => {
+              
+            }).catch(() => {
+                       
+            });
        },
 
        /**
-        * [getExplicitWordList 获取管理端列表数据]
+        * [getExplicitWordList 获取用户列表数据]
         * @Author   罗文
         * @DateTime 2017-10-19
         * @return   {[type]}     [description]
         */
        getExplicitWordList() {
-          this.$http.get('/User/List',{
-            params:{
-               ps:this.pageCount,
-               cp:this.currentPage,
-               keyword:this.keyword
-            }
-          }).then((res) => {
-            if (res.data.Code == 200) {
+          this.apiTransfer('get','/User/List',{
+             ps:this.pageCount,
+             cp:this.currentPage,
+             keyword:this.keyword
+          },res => {
+             if (res.data.Code == 200) {
                this.tableData = res.data.Data.ItemList;
                this.totalCount = res.data.Data.RecordCount;
-            }else {
+             }else {
                this.$message({
                   message: res.data.Description,
                   type: 'error'
                });
             }
-          })
+          }); 
        },
        
        /**
-        * [handleDelete 停用或解锁]
+        * [handleChangeState 停用或解锁]
         * @Author   罗文
         * @DateTime 2017-10-30
         * @param    {[type]}   index [行索引]
         * @param    {[type]}   row   [行数据]
         * @return   {[type]}         [description]
         */
-       handleDelete(index,row) {
+       handleChangeState(index,row) {
+          let text = row.State == 1 ? '停用':'启用';
+          this.$confirm('确定 '+text+' 该用户?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
             let state = 1;
 
             switch (row.State) {
@@ -223,67 +221,34 @@
                     type: 'error'
                   });
                 }
-             })
+            })
+          }).catch(() => {
+        
+          });
        },
 
        /**
-        * [handleUpdate 修改用户]
+        * [openAddUsersDialog 打开新增用户框]
         * @Author   罗文
         * @DateTime 2017-10-30
         * @return   {[type]}   [description]
         */
-       handleUpdate(){
-            this.formLabelAlign.Password = hex_sha1(this.formLabelAlign.Password);
-            switch (this.formLabelAlign.UserType) {
-              case '专家':
-                this.formLabelAlign.UserType = 2;
-                break;
-              case '管理员':
-                this.formLabelAlign.UserType = 3;
-                break;
-              case '用户':
-                this.formLabelAlign.UserType = 4;
-                break;    
-              default:
-                // statements_def
-                break;
-            }
-
-          	this.$http.post('/User/Update',this.formLabelAlign).then((res) => {
-              if (res.data.Code == 200) {
-                 this.getExplicitWordList();
-                 this.$message({
-                    message: '修改成功！',
-                    type: 'success'
-                  });
-                 this.dialogVisible = false;
-              }else {
-                 this.$message({
-                    message: res.data.Description,
-                    type: 'error'
-                  });
-                }
-             })
+       openAddUsersDialog(){
+        this.dialogVisible = true;
+    
        },
-       
-      //搜索
-      handleIconClick() { 
-//    	alert('被点了');
-          this.$http.get('/User/List',{
-            params:{
-              RealName:this.keyWord
-            }
-          }).then((res) => {
-            if (res.data.Code == 200) {
-               this.tableData = res.data.Data.ItemList;
-            }else {
-               this.$message({
-                  message: res.data.Description,
-                  type: 'error'
-               });
-            }
-          })
-      },
+
+       /**
+        * [handleAddUsers 新增用户]
+        * @Author   罗文
+        * @DateTime 2017-10-30
+        * @return   {[type]}   [description]
+        */
+       handleAddUsers(){
+        this.dialogVisible = true;
+    
+       },
+
       //切换每页的条数
       handleSizeChange(val) {
         this.pageCount = val;
@@ -298,14 +263,13 @@
       },
      },
      mounted() {
-        this.setWindow();
-        this.getExplicitWordList('');
-        this.getExplicitWordList(true);
-        this.getExplicitWordList(false);
+        this.getExplicitWordList();
+        this.setWindow(window.innerWidth,window.innerHeight);
         window.onresize = ()=>{
-           this.setWindow();
+           this.setWindow(window.innerWidth,window.innerHeight);
         }
-     }
+     },
+
    }
 </script>
 <style lang="css">

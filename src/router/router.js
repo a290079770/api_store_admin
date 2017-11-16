@@ -37,6 +37,14 @@ export default new Router({
          {
             path: 'managers',
             component: resolve => require(['@/components/admin/managers'], resolve),
+         },
+         {
+            path: 'apiList',
+            component: resolve => require(['@/components/admin/apiList'], resolve),
+         },
+         {
+            path: 'apiDetail',
+            component: resolve => require(['@/components/admin/apiDetail'], resolve),
          }
       ]
     },

@@ -7,24 +7,14 @@
        <span class="yellow-place"></span>
      </div>
     <el-row>
-        <el-col :span="18" >&nbsp;</el-col>
-<!--         <el-col :span="12" >
-          <el-select v-model="selectType" >
-            <el-option label="全部" value="全部"></el-option>
-            <el-option label="知识元" value="知识元"></el-option>
-            <el-option label="知识簇" value="知识簇"></el-option>
-            <el-option label="知识链" value="知识链"></el-option>
-          </el-select>
-
-          <el-select v-model="shenhe" >
-            <el-option label="全部" value="全部"></el-option>
-            <el-option label="正在审核" value="正在审核"></el-option>
-            <el-option label="待审核" value="待审核"></el-option>
-          </el-select>
-        </el-col> -->
+        <el-col :span="18" >
+          <el-button
+          size="success"
+          @click="openAddProductDialog(1)" icon="el-icon-plus">新增产品</el-button>
+        </el-col>
         <el-col :span="6" >
             <el-input 
-              placeholder="请输入名称/KOI编码" 
+              placeholder="请输入产品名称查找" 
               suffix-icon="el-icon-search"
               v-model="keyWord" 
               @keyup.enter.native="handleIconClick"
@@ -38,36 +28,68 @@
       :border="true"
       style="margin-top:30px">
         <el-table-column
-          prop="Id"
-          label="ID"
-          width="180">
-        </el-table-column>
-        <el-table-column
           prop="Title"
-          label="名称"
-          width="180">
+          label="产品名称"
+          width="150">
         </el-table-column>
-        <el-table-column
-          label="类型"
-          width="180">
-          <template slot-scope="scope">
-             {{scope.row.ObjectType ? (scope.row.ObjectType == 1 ? '知识元':(scope.row.ObjectType == 2 ? '知识簇' :'知识链')): '暂无信息' }}
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="审核状态">
-          <template slot-scope="scope">
-             {{'已审核'}}
-          </template>
-        </el-table-column>
+
         <el-table-column
           prop="KoiNumber"
-          label="KOI编码">
+          label="产品描述">
           <template slot-scope="scope">
               {{scope.row.KoiNumber ? scope.row.KoiNumber : '未通过审核'}}
           </template>
         </el-table-column>
+
+        <el-table-column
+          prop="address"
+          label="操作"
+          width="300"
+          >
+          <template slot-scope="scope">
+            <el-button
+              size="small"
+              type="primary"
+              @click="toApiList(scope.row.Id)">API列表</el-button>  
+            <el-button
+              size="small"
+              type="success"
+              @click="openAddProductDialog(2,scope.$index, scope.row)">修改</el-button>   
+            <el-button
+              size="small"
+              type="danger"
+              @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+            
+          </template>
+        </el-table-column>
     </el-table>
+
+
+    <el-dialog
+        title="新增用户"
+        :visible.sync="dialogVisible"
+        top="20vh"
+        width="60%"
+        >
+        <el-form label-position="right" ref="addUsers" label-width="120px" :model="formLabelAlign">
+          <el-form-item label="用户名" prop="username">
+            <el-input v-model="formLabelAlign.RealName" placeholder="请输入用户名" class="input-width" ></el-input>
+          </el-form-item>
+
+          <el-form-item label="密码" prop="password">
+            <el-input v-model="formLabelAlign.Password" type="password" placeholder="请输入用户密码" class="input-width"></el-input>
+          </el-form-item>
+
+          <el-form-item label="确认密码" prop="confirmPwd">
+            <el-input v-model="formLabelAlign.Password" type="password" placeholder="请再次确认密码" class="input-width"></el-input>
+          </el-form-item>
+
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="handleAddProduct">确 定</el-button>
+        </span>
+      </el-dialog>
 
 
     <!-- 分页 -->
@@ -89,30 +111,22 @@
    export default {
      data(){
       return {
-           // winWidth:window.innerWidth,
-           // winHeight:window.innerHeight,
-           toolsShow:false,
             tableData: [],
-            tableData1: [],
-            tableData2: [],
             dialogVisible:false,
-            aa:'',
-            shenhe:'全部',
-            selectType:'全部',
             keyWord:'',
             pageCount: 10,
             currentPage: 1,
             totalCount: 0,
+            formLabelAlign: {
+              UserId:100,
+              RealName: '',
+              Password: '',
+              UserType: '专家'    //用户类别:2-专家,3-管理员,4-用户
+            },
         }
      },
 
      methods:{
-       setWindow() {
-           this.$store.dispatch('setWindow',{
-              winWidth:window.innerWidth,
-              winHeight:window.innerHeight
-            });
-       },
        /**
         * [getExplicitWordList 获取管理端列表数据]
         * @Author   罗文
@@ -136,13 +150,45 @@
                 }
             })
        },
-       handleOpen(key, keyPath) {
-        console.log(typeof key);
 
+       /**
+        * [openAddProductDialog 打开新增产品框]
+        * @Author   罗文
+        * @DateTime 2017-11-13
+        * @param    {[Number]}   type  [操作类型 1 - 新增 2-修改]
+        * @param    {[Number]}   index [修改时传入，修改行索引]
+        * @param    {[Object]}   row   [修改时传入，修改行数据]
+        * @return   {[type]}         [description]
+        */
+       openAddProductDialog(type,index,row) {
+          this.dialogVisible = true;
        },
-       handleClose(key, keyPath) {
-        console.log(key, keyPath);
+       
+       /**
+        * [handleAddProduct 确定新增产品]
+        * @Author   罗文
+        * @DateTime 2017-11-13
+        * @return   {[type]}   [description]
+        */
+       handleAddProduct() {
+         this.dialogVisible = false;
        },
+       
+       /**
+        * [toApiList 跳转api列表]
+        * @Author   罗文
+        * @DateTime 2017-11-13
+        * @return   {[type]}   [description]
+        */
+       toApiList(productId) {
+          this.$router.push({
+            path:'/admin/apiList',
+            query:{
+              proId:productId
+            }
+          })
+       },
+
        handleEdit(index, row) {
          this.$confirm('审核通过?', '提示', {
             confirmButtonText: '确定',
@@ -158,14 +204,14 @@
           });
        },
        handleDelete(index, row) {
-          this.$confirm('确认驳回?', '提示', {
+          this.$confirm('该操作会删除该产品及其下所有的API，是否继续?', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
             this.$message({
               type: 'success',
-              message: '已驳回(功能演示)！'
+              message: '删除成功！'
             });
           }).catch(() => {
         
@@ -215,10 +261,10 @@
       },
      },
      mounted() {
-        this.setWindow();
+        this.setWindow(window.innerWidth,window.innerHeight);
         this.getExplicitWordList();
         window.onresize = ()=>{
-           this.setWindow();
+           this.setWindow(window.innerWidth,window.innerHeight);
         }
      }
    }
