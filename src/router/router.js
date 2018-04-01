@@ -13,13 +13,13 @@ export default new Router({
     {
       path: '/admin',
       component: resolve => require(['@/components/admin/admin'], resolve),
-      beforeEnter: (to, from, next) => {
-        if (sessionStorage.getItem('userId') && sessionStorage.getItem('userId') != 'undefined' ) {
-          next()
-        } else {
-          next({ path: '/login' })
-        }
-      },
+      // beforeEnter: (to, from, next) => {
+      //   if (sessionStorage.getItem('userId') && sessionStorage.getItem('userId') != 'undefined' ) {
+      //     next()
+      //   } else {
+      //     next({ path: '/login' })
+      //   }
+      // },
       redirect:'/admin/index',
       children:[
          {

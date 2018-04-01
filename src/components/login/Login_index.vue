@@ -3,9 +3,10 @@
      <h1 
      :style="{top:headTop +'px',opacity:headTop/100 * 2}"
      ref="headShake"
-     @mouseenter="headShakeAnimate"
-     @mouseleave="clearHeadShakeAnimate"
      >
+     <!-- @mouseenter="headShakeAnimate" -->
+     <!-- @mouseleave="clearHeadShakeAnimate" -->
+
        欢迎登陆NOVEN的专属API管理后台
      </h1>
      <img 
@@ -72,7 +73,8 @@
               <el-form-item>
                 <el-button 
                 type="primary" 
-                :icon="loading ? 'el-icon-loading' : ''" style="background:transparent" 
+                :icon="loading ? 'el-icon-loading' : ''" 
+                style="background:transparent" 
                 @click="loginIn('userInfo')"
                 :disabled="loading"
                 >
@@ -284,23 +286,23 @@ export default {
           this.userInfo.random = Math.random();
           
           //登录
-          this.apiTransfer('post','/passport/login',this.userInfo,(res)=>{
-              this.loading = false;
-              if(res.data.Code == 200) {
+          // this.apiTransfer('post','/passport/login',this.userInfo,(res)=>{
+          //     this.loading = false;
+          //     if(res.data.Code == 200) {
 
-                  //永久存储用于记录密码
-                  if (this.remember == true) {
-                    localStorage.setItem('password', this.userInfo.password);
-                  } else {
-                    localStorage.removeItem('password');
-                  }
+          //         //永久存储用于记录密码
+          //         if (this.remember == true) {
+          //           localStorage.setItem('password', this.userInfo.password);
+          //         } else {
+          //           localStorage.removeItem('password');
+          //         }
                  
-                  localStorage.setItem('account', this.userInfo.username);
-                  localStorage.setItem('remember', this.remember);
+          //         localStorage.setItem('account', this.userInfo.username);
+          //         localStorage.setItem('remember', this.remember);
                   
-                  //临时存储用于保存用户信息
-                  sessionStorage.setItem('userInfo', JSON.stringify(res.data.Data));
-                  sessionStorage.setItem('userId', res.data.Data.Id);
+          //         //临时存储用于保存用户信息
+          //         sessionStorage.setItem('userInfo', JSON.stringify(res.data.Data));
+          //         sessionStorage.setItem('userId', res.data.Data.Id);
 
 
                   this.$message({
@@ -309,13 +311,13 @@ export default {
                   });
 
                   this.$router.push({path:'/admin',query:{}});
-              }else {
-                  this.$message({
-                    message: res.data.Description,
-                    type: 'error'
-                  });
-              }
-          });
+          //     }else {
+          //         this.$message({
+          //           message: res.data.Description,
+          //           type: 'error'
+          //         });
+          //     }
+          // });
  
         } else {
           return false;
