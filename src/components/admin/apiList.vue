@@ -2,18 +2,18 @@
   <div class="index-cont" :style="{height:winHeight +'px',width: '92%',margin:'30px auto'}">
     <div class="table-page-title">
        <h3>
-         API列表 / <span class="apilist-product-title">KOI知识关系生成工具</span>
+         API列表
        </h3>
        <span class="yellow-place"></span>
      </div>
     <el-row>
-        <el-col :span="18" >
+        <el-col :span="16" >
           <el-button
           size="success"
           @click="createOrUpdateApi(1)" icon="el-icon-plus">新增API</el-button>
         </el-col>
 
-        <el-col :span="6" >
+        <el-col :span="8" >
             <el-input 
               placeholder="请输入中文名称/接口名查找" 
               suffix-icon="el-icon-search"
@@ -68,7 +68,7 @@
             <el-button
               size="small"
               type="primary"
-              @click="handleViewApiDetail(scope.$index, scope.row)">查看</el-button>   
+              @click="handleViewApiDetail(scope.row,scope.$index)">查看</el-button>   
             <el-button
               size="small"
               type="success"
@@ -139,19 +139,24 @@
          }
 
          this.$router.push({
-            path:'/admin/apiDetail',
+            path:'/admin/apiCreate',
             query:query
           })
       }, 
       
       /**
        * [handleViewApiDetail 查看api详情]
-       * @Author   罗文
-       * @DateTime 2017-11-13
-       * @return   {[type]}   [description]
+       * @param  {[Object]} item  [操作的对象]
+       * @param  {[Number]} index [操作的元素索引]
+       * @return {[type]}       [description]
        */
-      handleViewApiDetail() {
-      
+      handleViewApiDetail(item,index) {
+        this.$router.push({
+          path:'/admin/apiDetail',
+          query:{
+            apiId:item.Id
+          }
+        })
       },
 
       //切换每页的条数

@@ -24,26 +24,42 @@ export default new Router({
       children:[
          {
             path: 'index',
+            name:'首页',
             component: resolve => require(['@/components/admin/index'], resolve),
          },
          {
             path: 'products',
+            name:'产品列表',
             component: resolve => require(['@/components/admin/products'], resolve),
          },
          {
             path: 'users',
+            name:'用户列表',
             component: resolve => require(['@/components/admin/users'], resolve),
          },
          {
             path: 'managers',
+            name:'管理员列表',
             component: resolve => require(['@/components/admin/managers'], resolve),
          },
          {
             path: 'apiList',
+            name:'api接口列表',
             component: resolve => require(['@/components/admin/apiList'], resolve),
          },
          {
+            path: 'apiCreate',
+            name:'新增接口',
+            component: resolve => require(['@/components/admin/apiCreate'], resolve),
+         },
+         {
+            path: 'apiUpdate',
+            name:'修改接口',
+            component: resolve => require(['@/components/admin/apiUpdate'], resolve),
+         },
+         {
             path: 'apiDetail',
+            name:'接口详情',
             component: resolve => require(['@/components/admin/apiDetail'], resolve),
          }
       ]
