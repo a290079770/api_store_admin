@@ -39,7 +39,7 @@
             <h3 class="title">您好，管理员</h3>
             <input type="text" style="display:none">
             <input type="password" style="display:none">
-            <el-form-item prop='username'>
+            <el-form-item prop='account'>
               <el-input 
               type="text" 
               auto-complete="off" 
@@ -47,7 +47,7 @@
               autocapitalize="off" 
               spellcheck="false" 
               placeholder="用户名/邮箱" 
-              v-model='userInfo.username' 
+              v-model='userInfo.account' 
               @change="isChange=true"
               @keydown.native="tabKey($event)">
                 <template slot="prepend"><i class="el-icon-mobile-phone"></i></template>
@@ -114,7 +114,7 @@ export default {
 
       loading: false,
       userInfo: {
-        username: '',
+        account: '',
         password: '',
       },
 
@@ -126,7 +126,7 @@ export default {
       },
       remember: eval(sessionStorage.getItem('remember')) || eval(localStorage.getItem('remember')),
       rule_data: {
-        username: [{
+        account: [{
           required: true,
           message: '用户名不能为空！',
           trigger: 'blur'
@@ -260,7 +260,7 @@ export default {
        this.remember = eval(remember);
 
        //设置账号输入框
-       this.userInfo.username  = localStorage.getItem('account') || '';
+       this.userInfo.account  = localStorage.getItem('account') || '';
 
        //设置密码，根据上次用户的记录情况
        if(this.remember) {
@@ -286,23 +286,25 @@ export default {
           this.userInfo.random = Math.random();
           
           //登录
-          // this.apiTransfer('post','/passport/login',this.userInfo,(res)=>{
-          //     this.loading = false;
-          //     if(res.data.Code == 200) {
+          this.$http.post('/user/login',this.userInfo)
+          .then((res)=>{
+              this.loading = false;
 
-          //         //永久存储用于记录密码
-          //         if (this.remember == true) {
-          //           localStorage.setItem('password', this.userInfo.password);
-          //         } else {
-          //           localStorage.removeItem('password');
-          //         }
+              if(res.data.code == 200) {
+
+                  //永久存储用于记录密码
+                  if (this.remember == true) {
+                    localStorage.setItem('password', this.userInfo.password);
+                  } else {
+                    localStorage.removeItem('password');
+                  }
                  
-          //         localStorage.setItem('account', this.userInfo.username);
-          //         localStorage.setItem('remember', this.remember);
+                  localStorage.setItem('account', this.userInfo.account);
+                  localStorage.setItem('remember', this.remember);
                   
-          //         //临时存储用于保存用户信息
-          //         sessionStorage.setItem('userInfo', JSON.stringify(res.data.Data));
-          //         sessionStorage.setItem('userId', res.data.Data.Id);
+                  //临时存储用于保存用户信息
+                  sessionStorage.setItem('userInfo', JSON.stringify(res.data.data));
+                  sessionStorage.setItem('userId', res.data.data.Id);
 
 
                   this.$message({
@@ -311,13 +313,13 @@ export default {
                   });
 
                   this.$router.push({path:'/admin',query:{}});
-          //     }else {
-          //         this.$message({
-          //           message: res.data.Description,
-          //           type: 'error'
-          //         });
-          //     }
-          // });
+              }else {
+                  this.$message({
+                    message: res.data.Description,
+                    type: 'error'
+                  });
+              }
+          })
  
         } else {
           return false;
