@@ -70,9 +70,6 @@ export default new Router({
     {
       path: '/',redirect: '/login'
     },
-     {
-     path: '/index',
-     component: resolve => require(['@/components/index'], resolve),
-   }
+    
   ]
 })

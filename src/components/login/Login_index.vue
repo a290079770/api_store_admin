@@ -315,9 +315,10 @@ export default {
                   this.$router.push({path:'/admin',query:{}});
               }else {
                   this.$message({
-                    message: res.data.Description,
+                    message: res.data.description,
                     type: 'error'
                   });
+                  this.userInfo.password = '';
               }
           })
  

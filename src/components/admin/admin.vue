@@ -47,16 +47,8 @@
         </el-col>
         <el-col :span="19" :style="{minHeight:winHeight +'px',position:'relative'}">
            <div class="content-title">
-              <el-dropdown trigger="click">
-                <span class="el-dropdown-link" style="cursor:pointer">
-                  <i class="icon-my-user"></i>罗文
-                </span>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item>修改密码</el-dropdown-item>
-                  <el-dropdown-item>修改个人资料</el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-              <i class="icon-my-tuichu1"  style="font-size:16px" @click="signOut"></i> <span class="sign-out">退出</span>
+              <span class="sign-out" style="margin-right:0px"><i class="icon-my-user"></i>{{nickName}}</span>
+              <span class="sign-out" @click="signOut"><i class="icon-my-tuichu1"></i>退出</span>
            </div>
            <el-row :style="{height:winHeight-45 +'px',marginTop:'40px'}">
                 <img src="../../assets/images/背景图1.png" class="background-img left-top" :style="{top:'0'}" alt="">
@@ -114,7 +106,7 @@
              },
            ],
 
-            nickName:'',
+            nickName:JSON.parse(sessionStorage.userInfo).NickName,
             collapseSize: 500,
 
             cWidth : 240,   //画布宽
