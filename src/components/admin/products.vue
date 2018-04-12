@@ -43,7 +43,7 @@
         <el-table-column
           prop="address"
           label="操作"
-          width="300"
+          width="200"
           >
           <template slot-scope="scope">
             <el-button
@@ -54,10 +54,10 @@
               size="small"
               type="success"
               @click="openProductDialog(2,scope.$index, scope.row)">修改</el-button>   
-            <el-button
+<!--             <el-button
               size="small"
               type="danger"
-              @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+              @click="handleDelete(scope.$index, scope.row)">删除</el-button> -->
             
           </template>
         </el-table-column>

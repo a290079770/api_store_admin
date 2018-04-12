@@ -10,63 +10,118 @@
         <el-form :model="form" style="width:94%;" :label-width="formLabelWidth">
 
           <el-form-item label="API名称" >
-            <el-input v-model="form.title" placeholder="请输入名称" auto-complete="off"></el-input>
+            <el-input v-model="form.Title" placeholder="请输入名称" auto-complete="off"></el-input>
           </el-form-item>
 
           <el-form-item label="中文说明">
-            <el-input v-model="form.description" placeholder="请输入中文说明" auto-complete="off"></el-input>
+            <el-input v-model="form.ApiTitle" placeholder="请输入中文说明" auto-complete="off"></el-input>
           </el-form-item>
 
           <el-form-item label="所属分类">
-            <el-input v-model="form.category" placeholder="请输入描述分类" auto-complete="off"></el-input>
+             <el-select :disabled="isAddCateInputShow" v-model="form.CateId" placeholder="请选择">
+                <el-option
+                  v-for="(item,index) in categoryList"
+                  :key="index"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+
+              <i class="el-icon-circle-plus-outline api-add-icon" v-show="!isAddCateInputShow" @click="isAddCateInputShow = true"></i>
+
+              <el-input v-model="addCateInput" placeholder="请输入中文说明" auto-complete="off" style="width:20%" v-show="isAddCateInputShow"></el-input>
+
+              <i class="el-icon-circle-check api-add-icon" v-show="isAddCateInputShow" @click="addCategory"></i>
+
+              <i class="el-icon-circle-close api-add-icon close-param" v-show="isAddCateInputShow" @click="addCateInput = '';isAddCateInputShow = false;"></i>
           </el-form-item>
 
           <el-form-item label="请求方式">
-            <el-radio v-model="form.method" label="1" border>GET</el-radio>
-            <el-radio v-model="form.method" label="2" border>POST</el-radio>
+            <el-radio v-model="form.Methods" label="GET" border>GET</el-radio>
+            <el-radio v-model="form.Methods" label="POST" border>POST</el-radio>
           </el-form-item>
 
           <el-form-item label="输入参数">
-            <el-button type="primary" plain>新增</el-button>
+            <el-button type="primary" plain @click="addParams(1)">新增</el-button>
           </el-form-item>
 
        
          <!-- 参数 -->
-         <el-form-item :label="'参数 ' + (index + 1) " :key="index" v-for="(item,index) in params">
+         <el-form-item :label="'参数 ' + (index + 1) " :key="index" v-for="(item,index) in form.InputParams">
              <el-row>
                 <el-col :span="3" style="margin-right:4px">
-                  <el-input v-model="item.title" placeholder="参数名" auto-complete="off"></el-input>
+                  <el-input v-model="item.Title" placeholder="参数名" auto-complete="off"></el-input>
                 </el-col>
 
                 <el-col :span="5" style="margin-right:4px">
-                  <el-input v-model="item.desc" placeholder="描述" auto-complete="off"></el-input>
+                  <el-input v-model="item.Description" placeholder="描述" auto-complete="off"></el-input>
                 </el-col>
 
                 <el-col :span="3" style="margin-right:4px">
-                  <el-input v-model="item.type" placeholder="类型" auto-complete="off"></el-input>
+                  <el-input v-model="item.Type" placeholder="类型" auto-complete="off"></el-input>
                 </el-col>
 
                 <el-col :span="4" style="margin-right:4px">
-                  <el-input v-model="item.default" placeholder="默认值" auto-complete="off"></el-input>
+                  <el-input v-model="item.Default" placeholder="默认值" auto-complete="off"></el-input>
                 </el-col>
 
                 <el-col :span="4" style="margin-right:4px">
-                  <el-input v-model="item.test" placeholder="测试值" auto-complete="off"></el-input>
+                  <el-input v-model="item.Test" placeholder="测试值" auto-complete="off"></el-input>
                 </el-col>
 
                 <el-col :span="3" style="margin-right:4px">
-                  <el-checkbox v-model="item.isNecessary">是否必须</el-checkbox>
+                  <el-checkbox v-model="item.IsNecessary">是否必须</el-checkbox>
                 </el-col>
 
                 <el-col :span="1" class="close-param">
-                  <i class="el-icon-circle-close"></i>
+                  <i class="el-icon-circle-close" @click="removeParams(1,index)"></i>
                 </el-col>
             </el-row>
           </el-form-item>
 
+
+          <el-form-item label="输入参数">
+            <el-button type="primary" plain @click="addParams(2)">新增</el-button>
+          </el-form-item>
+
+       
+         <!-- 参数 -->
+         <el-form-item :label="'参数 ' + (index + 1) " :key="index" v-for="(item,index) in form.OutputParams">
+             <el-row>
+                <el-col :span="3" style="margin-right:4px">
+                  <el-input v-model="item.Title" placeholder="参数名" auto-complete="off"></el-input>
+                </el-col>
+
+                <el-col :span="5" style="margin-right:4px">
+                  <el-input v-model="item.Description" placeholder="描述" auto-complete="off"></el-input>
+                </el-col>
+
+                <el-col :span="3" style="margin-right:4px">
+                  <el-input v-model="item.Type" placeholder="类型" auto-complete="off"></el-input>
+                </el-col>
+
+                <el-col :span="4" style="margin-right:4px">
+                  <el-input v-model="item.Default" placeholder="默认值" auto-complete="off"></el-input>
+                </el-col>
+
+                <el-col :span="4" style="margin-right:4px">
+                  <el-input v-model="item.Test" placeholder="测试值" auto-complete="off"></el-input>
+                </el-col>
+
+                <el-col :span="3" style="margin-right:4px">
+                  <el-checkbox v-model="item.IsNecessary">是否必须</el-checkbox>
+                </el-col>
+
+                <el-col :span="1" class="close-param">
+                  <i class="el-icon-circle-close" @click="removeParams(2,index)"></i>
+                </el-col>
+            </el-row>
+          </el-form-item>
+
+
           <el-form-item label="描述">
             <el-input 
-            v-model="form.description" 
+            v-model="form.Description" 
             placeholder="请输入描述" 
             type="textarea" 
             auto-complete="off"
@@ -74,7 +129,7 @@
             ></el-input>
           </el-form-item> 
 
-          <el-form-item label="返回数据结构">
+<!--           <el-form-item label="返回数据结构">
             <el-input 
             v-model="form.description" 
             placeholder="请输入返回的数据结构" 
@@ -82,7 +137,7 @@
             auto-complete="off"
             rows="4"
             ></el-input>
-          </el-form-item> 
+          </el-form-item>  -->
 
 
           <el-form-item>
@@ -105,36 +160,130 @@
            winWidth:window.innerWidth,
            winHeight:window.innerHeight,
            form: {
-              title: '钢筋混泥土加固',
-              category: '科学',
-              description:'',
-              method:'1',
+              Title:'',
+              Description:'',
+              ApiTitle:'',
+              CateId:'',
+              Methods:'GET',
+              InputParams:[],
+              OutputParams:[],
            },
-           params:[
-              {
-                title:'',
-                desc:'',
-                type:'',
-                default:'',
-                test:'',
-                isNecessary:false,
-              },
-              {
-                title:'',
-                desc:'',
-                type:'',
-                default:'',
-                test:'',
-                isNecessary:false,
-              }
-           ],
+
            formLabelWidth: '120px',
+
+           categoryList:[],
+           isAddCateInputShow:false,
+           addCateInput:'',
+           newCateId:null,
+
 
         }
      },
      methods:{
+       /**
+        * [getDataList 获取分类列表]
+        * @Author   罗文
+        * @DateTime 2018-04-12
+        * @param    {Boolean}  isUpdatedList [是否是更新分类列表，如果是，需要选中刚添加的那个分类]
+        * @return   {[type]}                 [description]
+        */
+       getDataList(isUpdatedList = false) {
+          this.$http.get('/category/cateList',{
+            params:{
+              ps:999,
+              ProductId:this.$route.query.proId,
+            }
+          })
+          .then((res)=>{
+              if(res.data.code == 200) {
+                  //永久存储用于记录密码
+                  this.categoryList = res.data.data.map((item)=>{
+                     if(isUpdatedList && item.Id == this.newCateId) this.form.CateId =  +this.newCateId;
+
+                     return Object.assign({},{
+                       label:item.Title,
+                       value:item.Id,
+                     })
+                  })
+
+                  
+              }else {
+                  this.$message.error(res.data.description);
+              }
+          })
+       },
+
+       /**
+        * [addCategory 添加分类]
+        * @Author   罗文
+        * @DateTime 2018-04-12
+        */
+       addCategory() {
+          if(!this.addCateInput || this.addCateInput.trim() == '' ) {
+             this.$message.warning('请输入分类名！');
+             return;
+          }
 
 
+          this.$http.post('/category/createOrUpdate',{
+            ProductId:this.$route.query.proId,
+            Title:this.addCateInput
+          })
+          .then((res)=>{
+              if(res.data.code == 200) {
+                this.$message.success('新增分类成功！');
+                this.addCateInput = '';
+                this.isAddCateInputShow = false;
+                this.newCateId = res.data.data;
+
+                this.getDataList(true);
+              }else {
+                this.$message.error(res.data.description);
+              }
+          })
+       },
+
+       /**
+        * [addParams 新增参数]
+        * @Author   罗文
+        * @DateTime 2018-04-12
+        * @param    {[Number]}   type [1 - 输入参数  2-输出参数]
+        */
+       addParams(type) {
+          let newParams = {
+              Title:'',
+              Description:'',
+              Type:'',
+              Default:'',
+              Test:'',
+              IsNecessary:true,
+          }
+ 
+          if(type == 1) {
+            this.form.InputParams.push(newParams);
+          }else {
+            this.form.OutputParams.push(newParams);
+          }
+       },
+       
+       /**
+        * [addParams 删除一个参数]
+        * @Author   罗文
+        * @DateTime 2018-04-12
+        * @param    {[Number]}   type [1 - 输入参数  2-输出参数]
+        * @param    {[Number]}   index [删除参数的索引]
+        */
+       removeParams(type,index) {
+          if(type == 1) {
+            this.form.InputParams.splice(index,1);
+          }else {
+            this.form.OutputParams.splice(index,1);
+          }
+       }
+
+     },
+     created() {
+       this.getDataList();
      },
      mounted() {
      },
@@ -155,9 +304,24 @@
 
     .close-param {
       margin-right:4px;
-      color:red;
+      color:#ff4949 !important;
       font-size:24px;
       cursor: pointer;
+    }
+
+    .close-param:hover {
+      color:red !important;
+    }
+
+    .api-add-icon {
+      transform: translate(0,5px);
+      font-size: 24px;
+      cursor: pointer;
+      color:#21b384;
+    }
+
+    .api-add-icon:hover {
+      color:#13ce66;
     }
 </style>
 
