@@ -22,17 +22,92 @@ class Api extends Controller
         $this->response = new Response();
 	}
 
-	public function index()
-    {
-        return 1;
-    }
-
+    /**
+     * [apiList 获取该产品的api列表]
+     * @Author   罗文
+     * @DateTime 2018-04-16
+     * @return   [type]     [description]
+     */
     public function apiList()
     {
-        return 1;
-    }
+    	if(!request()->get('ProductId')) {
+       	  $this->response->setResponse(21,'所属产品编号不能为空！');
+       	  return;
+        }
 
+        $cateList = array();
 
+        if(request()->get('keywords') && request()->get('keywords') !== '') {
+           //先查找该产品下所有该关键字的api，再遍历api查找对应的分类
+           $apis = Db::name('apis')
+           ->where('ProductId',request()->get('ProductId'))
+           ->where('Title|ApiTitle','like','%'.request()->get('keywords').'%')
+           ->select();
+
+           $cateList = array();
+
+           if(count($apis) > 0) {
+           	  //先push一条进去，才能进行后面的foreach循环
+              $cate = Db::name('category')
+		        	 ->where('Id',$apis[0]['CateId'])
+		        	 ->select();
+		      $cate = $cate[0];
+		      
+		      $cate['ItemList'] = array();
+		      $cate['ItemList'][] = $apis[0];
+
+		      array_push($cateList,$cate);	
+
+		      array_splice($apis,0,1);
+
+		      foreach ($apis as $k => $v) {
+           	    foreach ($cateList as $ck => $cv) {
+
+                   if($cv['Id'] == $v['CateId']) {
+                   	  //如果匹配成功，则说明分类数组里已经有这个分类，此时只需要将该api push到这个分类数组中
+                   	  array_push($cateList[$k]['ItemList'],$v);
+                   	  break;
+                   }
+
+                   if($ck >= count($cateList) - 1) {
+                   	  //已经到最后一项，还没匹配成功，就需要去数据库取对应的category信息，并创建一个itemlist
+                   	  $cate = Db::name('category')
+				        	 ->where('Id',$v['CateId'])
+				        	 ->select();
+				      $cate = $cate[0];
+				      
+				      $cate['ItemList'] = array();
+				      $cate['ItemList'][] = $v;
+
+				      array_push($cateList,$cate);	 
+                   } 
+           	    }
+	          }
+           }
+
+           
+
+        }else {
+            //先获取所有的分类
+	        $cateList = Db::name('category')->where('ProductId',request()->get('ProductId'))->select();
+	        foreach ($cateList as $k => $v) {
+	        	$cateList[$k]['ItemList'] = Db::name('apis')
+	        	->where('CateId',$v['Id'])
+	        	->select();
+	        }
+        }
+
+        
+
+	    $this->response->setResponse(200,'成功！',$cateList);
+	}
+
+    /**
+     * [createOrUpdate 新增或修改api]
+     * @Author   罗文
+     * @DateTime 2018-04-16
+     * @return   [type]     [description]
+     */
     public function createOrUpdate()
     {   
         //必须post访问
@@ -116,9 +191,11 @@ class Api extends Controller
 
 	             //先删除掉 not in Ids集合中的输入输出参数
 	             Db::name('input_params')
+	             ->where('ApiId',request()->post('Id'))
 	             ->where('Id','not in',$inputIds)
 	             ->delete();
 	             Db::name('output_params')
+	             ->where('ApiId',request()->post('Id'))
 	             ->where('Id','not in',$outputIds)
 	             ->delete();
 
@@ -212,6 +289,41 @@ class Api extends Controller
 	       }
         }
         
+    }
+    
+    /**
+     * [detail 获取api详情]
+     * @Author   罗文
+     * @DateTime 2018-04-16
+     * @return   [type]     [description]
+     */
+    public function detail()
+    {
+       if(!request()->get('ApiId')) {
+       	  $this->response->setResponse(21,'查询的ApiId为空！');
+       	  return;
+       }
+
+       $res = Db::name('apis')
+	       ->where('Id',request()->get('ApiId'))
+	       ->select();
+
+	   if(count($res) <= 0) {
+           $this->response->setResponse(21,'未查询到该apiId相关信息');
+	   }else {
+           //获取输入输出参数
+           $api = $res[0];
+
+           $api['InputParams'] = Db::name('input_params')
+	       ->where('ApiId',request()->get('ApiId'))
+	       ->select();
+
+	       $api['OutputParams'] = Db::name('input_params')
+	       ->where('ApiId',request()->get('ApiId'))
+	       ->select();
+          
+           $this->response->setResponse(200,'成功！',$api);
+	   }    
     }
  
 

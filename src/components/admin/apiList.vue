@@ -18,66 +18,65 @@
               placeholder="请输入中文名称/接口名查找" 
               suffix-icon="el-icon-search"
               v-model="keyWord" 
-              @keyup.enter.native="handleIconClick"
+              @keyup.enter.native="getDataList"
               >
             </el-input>
         </el-col>
     </el-row>    
     
-    <h3 class="apilist-title">资源</h3>
-    <el-table
-      :data="tableData"
-      :border="true"
-      >
-        <el-table-column
-          label="编号"
-          prop="Id"
-          width="100">
-        </el-table-column>
+    <div v-for="(item,index) in dataList">
+      <h3 class="apilist-title">{{item.Title}}</h3>
+      <el-table
+        :data="item.ItemList"
+        :border="true"
+        >
+          <el-table-column
+            label="编号"
+            prop="Id"
+            width="100">
+          </el-table-column>
 
-        <el-table-column
-          label="接口名称"
-          width="150"
-          >
-          <template slot-scope="scope">
-             {{scope.row.UserName ? scope.row.UserName : '暂无信息'}}
-          </template>
-        </el-table-column>
+          <el-table-column
+            label="接口名称"
+            width="150"
+            prop="Title"
+            >
+          </el-table-column>
 
-         <el-table-column
-          label="请求方式"
-          width="100"
-          align="center"
-          >
-          <template slot-scope="scope">
-             POST
-          </template>
-        </el-table-column>
+          <el-table-column
+            label="中文说明"
+            prop="ApiTitle"
+            >
+          </el-table-column>
 
-        <el-table-column
-          label="中文说明"
-          prop="CreateTime"
-          >
-        </el-table-column>
+           <el-table-column
+            label="请求方式"
+            align="center"
+            prop="Methods"
+            width="150"
+            >
+          </el-table-column>
 
-        <el-table-column
-          prop="address"
-          label="操作"
-          width="200">
-          <template slot-scope="scope">
-            <el-button
-              size="small"
-              type="primary"
-              @click="handleViewApiDetail(scope.row,scope.$index)">查看</el-button>   
-            <el-button
-              size="small"
-              type="success"
-              @click="createOrUpdateApi(2,scope.row)">修改</el-button>
-            
-          </template>
-        </el-table-column>
 
-    </el-table>
+          <el-table-column
+            prop="address"
+            label="操作"
+            width="200">
+            <template slot-scope="scope">
+              <el-button
+                size="small"
+                type="primary"
+                @click="handleViewApiDetail(scope.row,scope.$index)">查看</el-button>   
+              <el-button
+                size="small"
+                type="success"
+                @click="createOrUpdateApi(2,scope.row)">修改</el-button>
+              
+            </template>
+          </el-table-column>
+
+      </el-table>
+    </div>
 
 
   </div>
@@ -88,35 +87,30 @@
      data(){
       return {
             winHeight:window.innerHeight,
-            tableData: [],
+            dataList: [],
             dialogVisible:false,
             keyWord:'',
         }
      },
      methods:{
        /**
-        * [getExplicitWordList 获取管理端列表数据]
+        * [getDataList 获取管理端列表数据]
         * @Author   罗文
         * @DateTime 2017-10-19
         * @param    {[Boolean]}   isshenhe [传入''，获取所有  true - 已审核  false - 未审核]
         * @return   {[type]}     [description]
         */
-       getExplicitWordList() {
-          this.$http.get('/History/List',{
+       getDataList() {
+          this.$http.get('/api/apiList',{
             params:{
-              ps:5,
-              cp:this.currentPage,
-              keyword:this.keyword
+              ProductId:this.$route.query.proId,
+              keywords:this.keyWord
             }
           }).then((res) => {
-            if (res.data.Code == 200) {
-               this.tableData = res.data.Data.ItemList;
-               this.totalCount = res.data.Data.RecordCount;
+            if (res.data.code == 200) {
+               this.dataList = res.data.data;
             }else {
-               this.$message({
-                  message: res.data.Description,
-                  type: 'error'
-               });
+               this.$message.error(res.data.description);
             }
           })
        },
@@ -163,12 +157,12 @@
       handleSizeChange(val) {
         this.pageCount = val;
         this.currentPage = 1;
-        this.getExplicitWordList()
+        this.getDataList()
       },
       //点击页数，请求第几页
       handleCurrentChange(val) {
         this.currentPage = val;
-        this.getExplicitWordList()
+        this.getDataList()
       },
      },
 
@@ -185,7 +179,7 @@
 
 
         this.setWindow(window.innerWidth,window.innerHeight);
-        this.getExplicitWordList();
+        this.getDataList();
         window.onresize = ()=>{
            this.setWindow(window.innerWidth,window.innerHeight);
         }

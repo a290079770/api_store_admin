@@ -89,11 +89,11 @@
                icon:'icon-my-personal-center',
                title:'产品列表'
              },
-             {
-               path:'/admin/users',
-               icon:'icon-my-users',
-               title:'用户列表'
-             },
+             // {
+             //   path:'/admin/users',
+             //   icon:'icon-my-users',
+             //   title:'用户列表'
+             // },
              {
                path:'/admin/managers',
                icon:'icon-my-guanliyuan',
