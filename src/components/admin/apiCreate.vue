@@ -160,7 +160,7 @@
            winWidth:window.innerWidth,
            winHeight:window.innerHeight,
            form: {
-              Id:14,
+              // Id:14,
               Title:'',
               Description:'',
               ApiTitle:'',
@@ -222,7 +222,16 @@
          this.$http.post('/api/createOrUpdate',this.form)
           .then((res)=>{
               if(res.data.code == 200) {
-                 
+                 this.$message.success(res.data.description);
+
+                 setTimeout(()=>{
+                    this.$router.push({
+                      path:'/admin/apiList',
+                      query:{
+                        proId:this.$route.query.proId
+                      }
+                    })
+                 }, 1000)   
               }else {
                  this.$message.error(res.data.description);
               }
