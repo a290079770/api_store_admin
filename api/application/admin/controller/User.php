@@ -5,8 +5,11 @@ use think\request;
 use think\Db;
 use think\Validate;
 
+use lib\response;
+
 class User extends Controller
-{
+{  
+    private $response = null;
     private $error = 21;
     private $success = 200;
 
@@ -21,6 +24,7 @@ class User extends Controller
 
     public function __construct() {
        $this->validate = new Validate($this->loginRules);
+       $this->response = new Response();
     }  
     
     //用户登录
@@ -33,15 +37,17 @@ class User extends Controller
        $arr = Db::name('users')->where('Account',request()->post('account'))->find();
 
        if(!$arr) {
-         $this->setResponse(21,'您还未注册！');
-       }else if($arr['UserType'] !== 2 && $arr['UserType'] !== 3) {
-         $this->setResponse(21,'权限不足，不能登陆后台管理平台！');
+         $this->response->setResponse(21,'您还未注册！');
+       }else if($arr['UserType'] != 2 && $arr['UserType'] != 3) {
+         echo $arr['UserType'];
+         return;
+         $this->response->setResponse(21,'权限不足，不能登陆后台管理平台！');
        }else if(request()->post('password') !== $arr['Password']) {
-         $this->setResponse(21,'账号或密码错误！');
+         $this->response->setResponse(21,'账号或密码错误！');
        }else {
        	 unset($arr['Password']);
          //返回数据
-       	 $this->setResponse(200,'登录成功',$arr);
+       	 $this->response->setResponse(200,'登录成功',$arr);
 
          //设置上次和本次登录的ip
          $arr['LastTime'] = $arr['ThisTime'];
@@ -64,7 +70,7 @@ class User extends Controller
       //验证手机号是否注册
       $arr = Db::name('users')->where('account',request()->post('account'))->find();
       if(count($arr) !== 0) {
-         $this->setResponse(21,'该手机号已注册，请直接登录！');
+         $this->response->setResponse(21,'该手机号已注册，请直接登录！');
          return;
       }
 
@@ -74,21 +80,21 @@ class User extends Controller
       //验证昵称
       if(request()->post('nickName')) {
          if(!$va->check(request()->post('nickName'))) {
-            $this->setResponse(21,'昵称不能含有非法字符！');
+            $this->response->setResponse(21,'昵称不能含有非法字符！');
             return;
          }
       }
 
       //验证年龄
       if((request()->post('age') && !is_numeric(request()->post('age'))) || request()->post('age') < 0) {
-            $this->setResponse(21,'年龄只能为大于0的数字');
+            $this->response->setResponse(21,'年龄只能为大于0的数字');
             return;
       }
 
       //验证性别
       if(request()->post('sex')) {
           if(!in_array(request()->post('sex'), array('男','女','保密'))) {
-             $this->setResponse(21,'年龄只能为男、女、保密中的一个');
+             $this->response->setResponse(21,'年龄只能为男、女、保密中的一个');
              return;
           }
       }
@@ -99,9 +105,9 @@ class User extends Controller
 
       if($res == 1) {
          $userId = Db::name('users')->getLastInsID();
-         $this->setResponse(200,'注册成功！',$userId);
+         $this->response->setResponse(200,'注册成功！',$userId);
       }else {
-         $this->setResponse(21,'注册失败！');
+         $this->response->setResponse(21,'注册失败！');
       }
   
     }
@@ -123,7 +129,7 @@ class User extends Controller
          $count = Db::name('users')
              ->where('account|nickName','like','%'.$keywords.'%')
              ->count();        
-        $this->setResponse(200,'ok',$arr,$count);
+        $this->response->setResponse(200,'ok',$arr,$count);
     }
 
     //获取今日登陆用户列表
@@ -144,26 +150,26 @@ class User extends Controller
              ->whereTime('ThisTime','today')
              ->count();    
 
-        $this->setResponse(200,'ok',$arr,$count);
+        $this->response->setResponse(200,'ok',$arr,$count);
     }
 
     //验证旧密码
     public function validOldPwd() 
     {
       if(request()->isGet()) {
-        $this->setResponse(21,'请求方式错误！');
+        $this->response->setResponse(21,'请求方式错误！');
         return;
       }
 
       // 验证id
       if(!request()->post('userId')) {
-        $this->setResponse(21,'用户编号不能为空！');
+        $this->response->setResponse(21,'用户编号不能为空！');
         return;
       }
 
       //验证旧密码是否传入
       if(!request()->post('oldPwd')) {
-        $this->setResponse(21,'原始密码不能为空！');
+        $this->response->setResponse(21,'原始密码不能为空！');
         return;
       }
 
@@ -171,11 +177,11 @@ class User extends Controller
 
       //对比数据库
       if(!$arr) {
-        $this->setResponse(21,'未获取到用户信息！');
+        $this->response->setResponse(21,'未获取到用户信息！');
       }else if($arr[0]['password'] !== request()->post('oldPwd')){
-        $this->setResponse(21,'原始密码错误！');
+        $this->response->setResponse(21,'原始密码错误！');
       }else {
-        $this->setResponse(200,'ok');
+        $this->response->setResponse(200,'ok');
       }
     }
 
@@ -183,19 +189,19 @@ class User extends Controller
     public function updatePwd()
     {
       if(!request()->isPost()) {
-        $this->setResponse(21,'请求方式错误！');
+        $this->response->setResponse(21,'请求方式错误！');
         return;
       }
 
       //验证id
       if(!request()->post('userId')) {
-        $this->setResponse(21,'用户编号不能为空！');
+        $this->response->setResponse(21,'用户编号不能为空！');
         return;
       }
 
       //验证新密码是否传入
       if(!request()->post('newPwd')) {
-        $this->setResponse(21,'新密码不能为空！');
+        $this->response->setResponse(21,'新密码不能为空！');
         return;
       }
 
@@ -203,14 +209,14 @@ class User extends Controller
 
       //对比数据库
       if(!$arr) {
-        $this->setResponse(21,'未获取到用户信息，修改失败！');
+        $this->response->setResponse(21,'未获取到用户信息，修改失败！');
       }else if($arr[0]['password'] == request()->post('newPwd')){
-        $this->setResponse(21,'新密码不能与旧密码一致');
+        $this->response->setResponse(21,'新密码不能与旧密码一致');
 
       }else if(Db::name('users')->where('id',request()->post('userId'))->update(['password'=>request()->post('newPwd')]) == 0){
-        $this->setResponse(21,'修改密码失败！');
+        $this->response->setResponse(21,'修改密码失败！');
       }else {
-        $this->setResponse(200,'修改成功！');
+        $this->response->setResponse(200,'修改成功！');
       }
     }
 
@@ -219,7 +225,7 @@ class User extends Controller
     {
         //必须post访问
         if(request()->isGet()) {
-          $this->setResponse(21,'请求方式错误！');
+          $this->response->setResponse(21,'请求方式错误！');
           return false;
         }
 
@@ -227,13 +233,13 @@ class User extends Controller
 
         if(!$result) {
            //验证账号密码不能为空
-           $this->setResponse(21,'账号或密码不能为空！');
+           $this->response->setResponse(21,'账号或密码不能为空！');
            return false;
         }
 
         // if(!preg_match('/^1[34578]\d{9}$/', request()->post('account'))  ) {
         //    //验证手机号
-        //    $this->setResponse(21,'请输入正确的手机号');
+        //    $this->response->setResponse(21,'请输入正确的手机号');
         //    return false;
         // }
 

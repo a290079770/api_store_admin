@@ -5,17 +5,25 @@ use think\request;
 use think\Db;
 use think\Validate;
 
+use lib\response;
+
 class Category extends Controller
 {
+    private $response = null;
+    
     private $Title = [
         'Title'=>'chsAlphaNum'
     ];
+
+    public function __construct() {
+       $this->response = new Response();
+    }
     //获取分类列表
     public function cateList()
     { 
          //验证必填项-所属产品
         if(!request()->get('ProductId')) {
-          $this->setResponse(21,'所属产品编号为空！');
+          $this->response->setResponse(21,'所属产品编号为空！');
           return;
         }
 
@@ -34,7 +42,7 @@ class Category extends Controller
                  ->where('Title','like','%'.$keywords.'%')
                  ->where('ProductId',request()->get('ProductId'))
                  ->count();      
-        $this->setResponse(200,'ok',$arr,$count);
+        $this->response->setResponse(200,'ok',$arr,$count);
     }
 
     //新增或修改分类
@@ -43,19 +51,19 @@ class Category extends Controller
         //参数  Title cateEngName  cateId
         //必须post访问
         if(request()->isGet()) {
-          $this->setResponse(21,'请求方式错误！');
+          $this->response->setResponse(21,'请求方式错误！');
           return;
         }
 
         //验证分类名
         if(!request()->post('Title')) {
-          $this->setResponse(21,'分类名不能为空！');
+          $this->response->setResponse(21,'分类名不能为空！');
           return;
         }
 
         //验证分类名
         if(!request()->post('ProductId')) {
-          $this->setResponse(21,'所属产品编号为空！');
+          $this->response->setResponse(21,'所属产品编号为空！');
           return;
         }
 
@@ -64,7 +72,7 @@ class Category extends Controller
         //不能有非法字符
         if(!$va->check(request()->post('Title')) ) {
            //验证手机号
-           $this->setResponse(21,'分类名不能有非法字符！');
+           $this->response->setResponse(21,'分类名不能有非法字符！');
            return false;
         }
 
@@ -79,9 +87,9 @@ class Category extends Controller
 
              if($res == 1) {
                 $cateId = Db::name('category')->getLastInsID();
-                $this->setResponse(200,'新增成功！',$cateId);
+                $this->response->setResponse(200,'新增成功！',$cateId);
              }else {
-                $this->setResponse(21,'新增失败！');
+                $this->response->setResponse(21,'新增失败！');
              }
         }else {
           //修改操作
@@ -93,9 +101,9 @@ class Category extends Controller
              $res = Db::name('category')->where('Id',request()->post('Id'))->update($arr);
 
              if($res !== 0) {
-                $this->setResponse(200,'修改成功！');
+                $this->response->setResponse(200,'修改成功！');
              }else {
-                $this->setResponse(21,'修改失败！');
+                $this->response->setResponse(21,'修改失败！');
              }
         }
     }
@@ -105,22 +113,22 @@ class Category extends Controller
     {
         //必须post访问
         if(request()->isGet()) {
-          $this->setResponse(21,'请求方式错误！');
+          $this->response->setResponse(21,'请求方式错误！');
           return;
         }
 
         //根据cateId删除
         if(!request()->post('cateId')) {
-           $this->setResponse(21,'分类编号不能为空！');
+           $this->response->setResponse(21,'分类编号不能为空！');
            return;
         }
 
         $res = Db::name('category')->where('id',request()->post('cateId'))->delete();
 
         if($res == 0) {
-           $this->setResponse(21,'删除失败！');
+           $this->response->setResponse(21,'删除失败！');
         }else {
-           $this->setResponse(200,'删除成功！');
+           $this->response->setResponse(200,'删除成功！');
         }
     }
 

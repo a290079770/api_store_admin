@@ -6,8 +6,10 @@ use think\Db;
 
 use think\Validate;
 
+use lib\response;
 class Product extends Controller
-{
+{   
+    private $response = null;
     private $valid = [
         'Title'=>'chsAlphaNum',
     ];
@@ -28,6 +30,9 @@ class Product extends Controller
                             13 => '删除成功！',
                             14 => '产品ID不正确，没有这个产品！',
                           );
+    public function __construct() {
+       $this->response = new Response();
+    }
     //获取分类列表
     public function productList()
     {
@@ -48,7 +53,7 @@ class Product extends Controller
              ->where('Title','like','%'.$keywords.'%')
              ->count();    
 
-         $this->setResponse(200,'ok',$arr,$count);
+         $this->response->setResponse(200,'ok',$arr,$count);
     }
 
     //新增或修改分类
@@ -57,19 +62,19 @@ class Product extends Controller
         //参数 Id Title Description Url CreateTime
         //必须post访问
         if(request()->isGet()) {
-          $this->setResponse(21,$this->error[0]);
+          $this->response->setResponse(21,$this->error[0]);
           return;
         }
 
         //先迅速验证必填字段
         if(!request()->post('Title')) {
-          $this->setResponse(21,$this->error[1]);
+          $this->response->setResponse(21,$this->error[1]);
           return;
         }else if(!request()->post('Description')) {
-          $this->setResponse(21,$this->error[3]);
+          $this->response->setResponse(21,$this->error[3]);
           return;
         }else if(!request()->post('Url')) {
-          $this->setResponse(21,$this->error[4]);
+          $this->response->setResponse(21,$this->error[4]);
           return;
         }
 
@@ -77,7 +82,7 @@ class Product extends Controller
 
         //验证产品名
         if(!$va->check(request()->post('Title'))) {
-          $this->setResponse(21,$this->error[6]);
+          $this->response->setResponse(21,$this->error[6]);
           return;
         }
 
@@ -95,18 +100,18 @@ class Product extends Controller
 
              if($res == 1) {
                 $Id = Db::name('products')->getLastInsID();
-                $this->setResponse(200,$this->error[8],$Id);
+                $this->response->setResponse(200,$this->error[8],$Id);
              }else {
-                $this->setResponse(21,$this->error[9]);
+                $this->response->setResponse(21,$this->error[9]);
              }
         }else {
           //修改操作
              $res = Db::name('products')->where('Id',request()->post('Id'))->update($arr);
 
              if($res !== 0) {
-                $this->setResponse(200,$this->error[10]);
+                $this->response->setResponse(200,$this->error[10]);
              }else {
-                $this->setResponse(21,$this->error[11]);
+                $this->response->setResponse(21,$this->error[11]);
              }
         }
     }
@@ -117,22 +122,22 @@ class Product extends Controller
         //参数 Id
         //必须post访问
         if(request()->isGet()) {
-          $this->setResponse(21,$this->error[0]);
+          $this->response->setResponse(21,$this->error[0]);
           return;
         }
 
         //根据Id删除7
         if(!request()->post('Id')) {
-           $this->setResponse(21,'产品ID不能为空！');
+           $this->response->setResponse(21,'产品ID不能为空！');
            return;
         }
 
         $res = Db::name('products')->where('id',request()->post('Id'))->delete();
 
         if($res == 0 ) {
-           $this->setResponse(21,$this->error[12]);
+           $this->response->setResponse(21,$this->error[12]);
         }else {
-           $this->setResponse(200,$this->error[13]);
+           $this->response->setResponse(200,$this->error[13]);
         }
     }
 
@@ -141,7 +146,7 @@ class Product extends Controller
     public function detail() {
         //根据Id查询
         if(!request()->get('Id') && !request()->post('Id')) {
-           $this->setResponse(21,'产品ID不能为空！');
+           $this->response->setResponse(21,'产品ID不能为空！');
            return;
         }
 
@@ -150,9 +155,9 @@ class Product extends Controller
         $res = Db::name('products')->where('Id',$Id)->select();
 
         if(count($res) == 0) {
-           $this->setResponse(21,$this->error[14]);
+           $this->response->setResponse(21,$this->error[14]);
         }else {
-           $this->setResponse(200,'ok',$res[0]);
+           $this->response->setResponse(200,'ok',$res[0]);
         }
     }
 
@@ -161,7 +166,7 @@ class Product extends Controller
     public function getIndexProductsList() {
         //必须get访问
         if(request()->isPost()) {
-          $this->setResponse(21,$this->error[0]);
+          $this->response->setResponse(21,$this->error[0]);
           return;
         }
 
@@ -178,7 +183,7 @@ class Product extends Controller
           }
         }
 
-        $this->setResponse(200,'ok',$res);
+        $this->response->setResponse(200,'ok',$res);
     }
 
 

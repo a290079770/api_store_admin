@@ -47,7 +47,7 @@
 
        
          <!-- 参数 -->
-         <el-form-item :label="'参数 ' + (index + 1) " :key="index" v-for="(item,index) in form.InputParams">
+         <el-form-item :label="'参数 ' + (index + 1) " :key="index +'input'" v-for="(item,index) in form.InputParams">
              <el-row>
                 <el-col :span="3" style="margin-right:4px">
                   <el-input v-model="item.Title" placeholder="参数名" auto-complete="off"></el-input>
@@ -86,7 +86,7 @@
 
        
          <!-- 参数 -->
-         <el-form-item :label="'参数 ' + (index + 1) " :key="index" v-for="(item,index) in form.OutputParams">
+         <el-form-item :label="'参数 ' + (index + 1) " :key="index +'output'" v-for="(item,index) in form.OutputParams">
              <el-row>
                 <el-col :span="3" style="margin-right:4px">
                   <el-input v-model="item.Title" placeholder="参数名" auto-complete="off"></el-input>
@@ -141,7 +141,7 @@
 
 
           <el-form-item>
-             <el-button type="primary">确认</el-button>
+             <el-button type="primary" @click="createOrUpdate">确认</el-button>
              <el-button @click="$router.go(-1)">返回</el-button>
           </el-form-item>
 
@@ -160,6 +160,7 @@
            winWidth:window.innerWidth,
            winHeight:window.innerHeight,
            form: {
+              Id:14,
               Title:'',
               Description:'',
               ApiTitle:'',
@@ -167,6 +168,7 @@
               Methods:'GET',
               InputParams:[],
               OutputParams:[],
+              ProductId:this.$route.query.proId
            },
 
            formLabelWidth: '120px',
@@ -175,7 +177,6 @@
            isAddCateInputShow:false,
            addCateInput:'',
            newCateId:null,
-
 
         }
      },
@@ -205,10 +206,25 @@
                        value:item.Id,
                      })
                   })
-
-                  
               }else {
                   this.$message.error(res.data.description);
+              }
+          })
+       },
+       
+       /**
+        * [create 新增api]
+        * @Author   罗文
+        * @DateTime 2018-04-16
+        * @return   {[type]}   [description]
+        */
+       createOrUpdate() {
+         this.$http.post('/api/createOrUpdate',this.form)
+          .then((res)=>{
+              if(res.data.code == 200) {
+                 
+              }else {
+                 this.$message.error(res.data.description);
               }
           })
        },

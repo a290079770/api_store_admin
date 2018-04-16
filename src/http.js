@@ -55,34 +55,34 @@ axios.interceptors.request.use(
  * @DateTime  2017-05-08T09:19:43+0800
  * 拦截器也可以判定返回的response成功时的状态码进行拦截
  */
-axios.interceptors.response.use(
-    res => {
-      // res.data.Code =34;
-       if (res.data.Code == 34) { //连接超时
-            MessageBox.alert('你已登录超时，请重新登陆后再试！', '提示', {
-              confirmButtonText: '确定',
-              type: 'warning',
-            }).then(()=>{
-              router.push('/');
-            })
-        }else{ //请求成功
-        return res;
-      }
-    },
-    error => {
-      if (error.response) {
-        switch (error.response.status) {
-          case 401:
-            // 401 清除token信息并跳转到登录页面
-            // store.commit(types.LOGOUT);
-            router.replace({
-                path: 'login',
-                query: {redirect: router.currentRoute.fullPath}
-            })
-        }
-      }
-      // console.log(JSON.stringify(error));//console : Error: Request failed with status code 402
-      // return Promise.reject(error.response.data)
-  });
+// axios.interceptors.response.use(
+//     res => {
+//       // res.data.Code =34;
+//        if (res.data.Code == 34) { //连接超时
+//             MessageBox.alert('你已登录超时，请重新登陆后再试！', '提示', {
+//               confirmButtonText: '确定',
+//               type: 'warning',
+//             }).then(()=>{
+//               router.push('/');
+//             })
+//         }else{ //请求成功
+//         return res;
+//       }
+//     },
+//     error => {
+//       if (error.response) {
+//         switch (error.response.status) {
+//           case 401:
+//             // 401 清除token信息并跳转到登录页面
+//             // store.commit(types.LOGOUT);
+//             router.replace({
+//                 path: 'login',
+//                 query: {redirect: router.currentRoute.fullPath}
+//             })
+//         }
+//       }
+//       // console.log(JSON.stringify(error));//console : Error: Request failed with status code 402
+//       // return Promise.reject(error.response.data)
+//   });
 
 export default axios;

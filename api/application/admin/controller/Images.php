@@ -4,8 +4,11 @@ use think\Controller;
 use think\request;
 use think\Db;
 
+use lib\response;
+
 class Images extends Controller
-{
+{   
+    private $response = null;
     private $error = array(
                             0 => '请求方式错误！',
                             1 => '所属产品id和图片类型不能为空!',
@@ -21,6 +24,10 @@ class Images extends Controller
                             11 => '删除成功！',
                             12 => '图片名称不能为空！',
                           );
+    public function __construct() {
+       $this->response = new Response();
+    }
+    
     //获取分类列表
     public function image_list()
     {
@@ -75,7 +82,7 @@ class Images extends Controller
         }
   
 
-        $this->setResponse(200,'ok',$arr,$count);
+        $this->response->setResponse(200,'ok',$arr,$count);
     }
 
     //上传文件
@@ -83,14 +90,14 @@ class Images extends Controller
     {
         // //参数 proId type
         if(!request()->post()  || count(request()->file()) === 0 || !request()->post('fileData')) {
-           $this->setResponse(21,$this->error[2]);
+           $this->response->setResponse(21,$this->error[2]);
            return;
         }
 
 
         //判断上传文件有没出错！
         if($_FILES['file']['error']) {
-          $this->setResponse(21,$this->error[5]);
+          $this->response->setResponse(21,$this->error[5]);
           return;
         }
 
@@ -98,13 +105,13 @@ class Images extends Controller
 
         //验证图片附加的图片数据
         if(!isset($fileData->type)) {
-           $this->setResponse(21,$this->error[3]);
+           $this->response->setResponse(21,$this->error[3]);
            return;
         }else if(!isset($fileData->proId)) {
-           $this->setResponse(21,$this->error[4]);
+           $this->response->setResponse(21,$this->error[4]);
            return;
         }else if(!isset($fileData->filename) || $fileData->filename == '') {
-           $this->setResponse(21,$this->error[12]);
+           $this->response->setResponse(21,$this->error[12]);
            return;
         }
 
@@ -120,7 +127,7 @@ class Images extends Controller
               //存文件
               if(file_exists($upload_file)) {
                 //文件已经存在
-                $this->setResponse(200,'上传成功！',array('url'=>$url));
+                $this->response->setResponse(200,'上传成功！',array('url'=>$url));
               }else {
                 //文件不存在，则新增
                 //验证通过，入库
@@ -139,13 +146,13 @@ class Images extends Controller
                   $info =  move_uploaded_file($_FILES['file']['tmp_name'], $upload_file);
 
                   if($info) {
-                     $this->setResponse(200,'上传成功！',array('url'=>$url));
+                     $this->response->setResponse(200,'上传成功！',array('url'=>$url));
                   }else {
-                     $this->setResponse(21,$this->error[6]);
+                     $this->response->setResponse(21,$this->error[6]);
                   }
 
                 }else {
-                    $this->setResponse(21,$this->error[7]);
+                    $this->response->setResponse(21,$this->error[7]);
                 }
                 
               }
@@ -160,22 +167,22 @@ class Images extends Controller
         //参数 proId
         //必须post访问
         if(request()->isGet()) {
-          $this->setResponse(21,$this->error[0]);
+          $this->response->setResponse(21,$this->error[0]);
           return;
         }
 
         //根据proId删除7
         if(!request()->post('imgId')) {
-           $this->setResponse(21,'图片ID不能为空！');
+           $this->response->setResponse(21,'图片ID不能为空！');
            return;
         }
 
         $res = Db::name('images')->where('id',request()->post('imgId'))->delete();
 
         if($res == 0 ) {
-           $this->setResponse(21,$this->error[10]);
+           $this->response->setResponse(21,$this->error[10]);
         }else {
-           $this->setResponse(200,$this->error[11]);
+           $this->response->setResponse(200,$this->error[11]);
         }
     }
     
@@ -187,7 +194,7 @@ class Images extends Controller
        
        $types = [1,2,3];
        if(!in_array($type,$types)) {
-          $this->setResponse(21,$this->error[8]);
+          $this->response->setResponse(21,$this->error[8]);
           return false;
        }else {
           $arr = Db::name('product')
@@ -195,7 +202,7 @@ class Images extends Controller
                  ->select();
 
           if(!$arr) {
-             $this->setResponse(21,$this->error[9]);
+             $this->response->setResponse(21,$this->error[9]);
              return false;
           }
 
