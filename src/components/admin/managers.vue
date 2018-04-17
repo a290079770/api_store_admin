@@ -92,17 +92,17 @@
         :visible.sync="dialogVisible"
         width="60%"
         >
-        <el-form :label-position="labelPosition" ref="addUsers" label-width="120px" :model="formLabelAlign">
-          <el-form-item label="账号" prop="username">
-            <el-input v-model="formLabelAlign.RealName" placeholder="请输入管理员账号" class="input-width" ></el-input>
+        <el-form :label-position="labelPosition" ref="addUsers" label-width="120px" :model="formLabelAlign" :rules="formRules">
+          <el-form-item label="账号" prop="Account">
+            <el-input v-model="formLabelAlign.Account" placeholder="请输入管理员账号" class="input-width" ></el-input>
           </el-form-item>
 
-          <el-form-item label="密码" prop="password">
+          <el-form-item label="密码" prop="Password">
             <el-input v-model="formLabelAlign.Password" type="password" placeholder="请输入管理员密码" class="input-width"></el-input>
           </el-form-item>
 
-          <el-form-item label="确认密码" prop="confirmPwd">
-            <el-input v-model="formLabelAlign.Password" type="password" placeholder="请再次确认密码" class="input-width"></el-input>
+          <el-form-item label="昵称" prop="NickName">
+            <el-input v-model="formLabelAlign.NickName" placeholder="请输入管理员昵称" class="input-width"></el-input>
           </el-form-item>
 
         </el-form>
@@ -131,6 +131,14 @@
 <script>
    export default {
      data(){
+      function checkApiTitle(rule, value, callback){
+        let reg = /[^a-zA-Z0-9_]/g;
+        if (reg.test(value)) {
+          callback(new Error('不能存在特殊字符！'))
+        } else {
+          callback();
+        }
+      }
       return {
            winWidth:window.innerWidth,
            winHeight:window.innerHeight,
@@ -144,10 +152,21 @@
             keyWord:'',
             labelPosition: 'right',
             formLabelAlign: {
-              UserId:100,
-              RealName: '',
+              Account: '',
               Password: '',
-              UserType: '专家'    //用户类别:2-专家,3-管理员,4-用户
+              NickName: '' 
+            },
+            formRules:{
+              // Account:[
+              //   {required:true,message:'账号不能为空！',trigger: 'blur'},
+              //   { validator: checkApiTitle, trigger: 'blur' }
+              // ],
+              // Password:[
+              //   {required:true,message:'请输入密码！',trigger: 'blur'},
+              // ],
+              // NickName:[
+              //   {required:true,message:'请输入管理员昵称！',trigger: 'blur'},
+              // ],
             },
             state:1, //用户状态，1--正常，2--已锁定，3-没有激活
             pageCount: 10,
@@ -251,7 +270,27 @@
         * @return   {[type]}   [description]
         */
        handleAddUsers(){
-        this.dialogVisible = false;
+        this.$refs['addUsers'].validate((valid) => {
+          if (valid) {
+             this.$http.post('/user/createOrUpdate',this.formLabelAlign)
+            .then((res)=>{
+                if(res.data.code == 200) {
+                   this.$message.success(res.data.description);
+
+                   setTimeout(()=>{
+                      this.$router.push({
+                        path:'/admin/apiList',
+                        query:{
+                          proId:this.$route.query.proId
+                        }
+                      })
+                   }, 1000)   
+                }else {
+                   this.$message.error(res.data.description);
+                }
+            })
+          }
+        })  
     
        },
        

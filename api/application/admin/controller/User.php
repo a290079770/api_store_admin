@@ -153,6 +153,29 @@ class User extends Controller
         $this->response->setResponse(200,'ok',$arr,$count);
     }
 
+    /**
+     * [createOrUpdate 新增或修改管理员]
+     * @Author   罗文
+     * @DateTime 2018-04-17
+     * @return   [type]     [description]
+     */
+    public function createOrUpdate() 
+    {
+      //验证请求方式和账号密码不能为空，账号只能为手机号
+      if(!$this->validateAccount()) return;
+
+      //验证昵称
+      $va = new Validate($this->NickName);
+
+      if(!request()->post('NickName')) {
+         $this->response->setResponse(21,'昵称不能为空！');
+         return;
+      }
+
+
+
+    }
+
     //验证旧密码
     public function validOldPwd() 
     {
