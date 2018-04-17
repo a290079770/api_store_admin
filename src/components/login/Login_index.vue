@@ -39,7 +39,7 @@
             <h3 class="title">您好，管理员</h3>
             <input type="text" style="display:none">
             <input type="password" style="display:none">
-            <el-form-item prop='account'>
+            <el-form-item prop='Account'>
               <el-input 
               type="text" 
               auto-complete="off" 
@@ -47,14 +47,14 @@
               autocapitalize="off" 
               spellcheck="false" 
               placeholder="用户名/邮箱" 
-              v-model='userInfo.account' 
+              v-model='userInfo.Account' 
               @change="isChange=true"
               @keydown.native="tabKey($event)">
                 <template slot="prepend"><i class="el-icon-mobile-phone"></i></template>
               </el-input>
             </el-form-item>
-            <el-form-item prop='password'>
-              <el-input ref="pwdInput" type="password" auto-complete="off" placeholder="密码" autocorrect="off" autocapitalize="off" spellcheck="false" v-model='userInfo.password' @keyup.enter="loginIn('userInfo')" @change="isChange=true">
+            <el-form-item prop='Password'>
+              <el-input ref="pwdInput" type="password" auto-complete="off" placeholder="密码" autocorrect="off" autocapitalize="off" spellcheck="false" v-model='userInfo.Password' @keyup.enter="loginIn('userInfo')" @change="isChange=true">
                 <template slot="prepend"><i class="el-icon-time"></i></template>
               </el-input>
             </el-form-item>
@@ -114,8 +114,8 @@ export default {
 
       loading: false,
       userInfo: {
-        account: '',
-        password: '',
+        Account: '',
+        Password: '',
       },
 
       isChange:false,
@@ -126,12 +126,12 @@ export default {
       },
       remember: eval(sessionStorage.getItem('remember')) || eval(localStorage.getItem('remember')),
       rule_data: {
-        account: [{
+        Account: [{
           required: true,
           message: '用户名不能为空！',
           trigger: 'blur'
         }],
-        password: [{
+        Password: [{
           validator:CheckLoginPsd,
           required: true,
           trigger: 'blur'
@@ -260,11 +260,11 @@ export default {
        this.remember = eval(remember);
 
        //设置账号输入框
-       this.userInfo.account  = localStorage.getItem('account') || '';
+       this.userInfo.Account  = localStorage.getItem('Account') || '';
 
        //设置密码，根据上次用户的记录情况
        if(this.remember) {
-          this.userInfo.password = localStorage.getItem('password') || '';
+          this.userInfo.Password = localStorage.getItem('Password') || '';
        }
        
     },
@@ -276,10 +276,10 @@ export default {
       this.$refs[userInfo].validate((valid) => {
         if (valid) {
 
-          var activePwd = localStorage.getItem('password') ? localStorage.getItem('password') : '';
+          var activePwd = localStorage.getItem('Password') ? localStorage.getItem('Password') : '';
 
-          if (this.userInfo.password !== activePwd) {
-            this.userInfo.password = hex_sha1(this.userInfo.password);
+          if (this.userInfo.Password !== activePwd) {
+            this.userInfo.Password = hex_sha1(this.userInfo.Password);
           }
           this.loading = true;
 
@@ -294,12 +294,12 @@ export default {
 
                   //永久存储用于记录密码
                   if (this.remember == true) {
-                    localStorage.setItem('password', this.userInfo.password);
+                    localStorage.setItem('Password', this.userInfo.Password);
                   } else {
-                    localStorage.removeItem('password');
+                    localStorage.removeItem('Password');
                   }
                  
-                  localStorage.setItem('account', this.userInfo.account);
+                  localStorage.setItem('Account', this.userInfo.Account);
                   localStorage.setItem('remember', this.remember);
                   
                   //临时存储用于保存用户信息
@@ -318,7 +318,7 @@ export default {
                     message: res.data.description,
                     type: 'error'
                   });
-                  this.userInfo.password = '';
+                  this.userInfo.Password = '';
               }
           })
  

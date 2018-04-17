@@ -10,7 +10,10 @@
         <el-col :span="18" >
           <el-button
           size="success"
+          v-if="isSuperAdmin"
           @click="openAddUsersDialog" icon="el-icon-plus">新增管理员</el-button>
+
+          <span v-else>&nbsp;</span>
         </el-col>
 
         <el-col :span="6" >
@@ -18,54 +21,69 @@
               placeholder="请输入管理员账号或昵称查找" 
               suffix-icon="el-icon-search" 
               v-model="keyWord" 
-              @keyup.enter.native="handleIconClick"
+              @keyup.enter.native="getDataList"
               >
             </el-input>
         </el-col>
     </el-row>    
 
     <el-table
-      :data="tableData"
+      :data="dataList"
       :border="true"
       style="margin-top:30px">
         <el-table-column
-        	prop='RealName'
-          label="用户名"
-          width="180"
-          align="center"
+          prop="Id"
+          label="ID"
+          width="80"
           >
         </el-table-column>
+
         <el-table-column
-          label="帐号"
-          prop="MobileNumber"
-          align="center">
+          prop="NickName"
+          label="昵称"
+          >
         </el-table-column>
+
         <el-table-column
+          prop="Account"
+          label="账号"
+          show-overflow-tooltip
+          >
+        </el-table-column>
+
+        <el-table-column
+          prop="CreateTime"
+          label="创建时间"
+          >
+        </el-table-column>
+
+
+         <el-table-column
           label="用户类型"
-          width="180"
-          align="center"
           >
           <template slot-scope="scope">
-             {{scope.row.UserType == 2 ? "专家" :""}}
-             {{scope.row.UserType == 3 ? "管理员" :""}}
-             {{scope.row.UserType == 4 ? "用户" :""}}
+              <el-tag type="success" v-if="scope.row.UserType == 3">超级管理员</el-tag>
+              <el-tag type="info" v-if="scope.row.UserType == 1">普通用户</el-tag>
+              <el-tag type="warning" v-if="scope.row.UserType == 2">管理员</el-tag>
           </template>
         </el-table-column>
-                <el-table-column
-                  prop="address"
-                  label="操作">
-                  <template slot-scope="scope">
-                    <el-button
-                      size="small"
-                      @click="handleUpdateUser(scope.$index, scope.row)">重置密码</el-button>  
-                    <el-button
-                      size="small"
-                      type="danger"
-                      @click="handleDelete(scope.$index, scope.row)">
-                      删除
-                    </el-button>
-                  </template>
-                </el-table-column>
+        <el-table-column
+          width="200"
+          label="操作"
+          v-if="isSuperAdmin"
+          >
+          <template slot-scope="scope">
+            <el-button
+              size="small"
+              @click="handleUpdateUser(scope.$index, scope.row)">重置密码</el-button>  
+            <el-button
+              size="small"
+              type="danger"
+              @click="handleDelete(scope.$index, scope.row)">
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
     </el-table>
     
     
@@ -116,8 +134,9 @@
       return {
            winWidth:window.innerWidth,
            winHeight:window.innerHeight,
+           isSuperAdmin:JSON.parse(sessionStorage.userInfo).UserType == 3 ? true : false,
            toolsShow:false,
-            tableData: [],
+            dataList: [],
             dialogVisible:false,
             aa:'',
             shenhe:'全部',
@@ -148,27 +167,24 @@
        },
 
        /**
-        * [getExplicitWordList 获取管理端列表数据]
+        * [getDataList 获取管理端列表数据]
         * @Author   罗文
         * @DateTime 2017-10-19
         * @return   {[type]}     [description]
         */
-       getExplicitWordList() {
-          this.$http.get('/User/List',{
+       getDataList() {
+          this.$http.get('/User/userList',{
             params:{
                ps:this.pageCount,
                cp:this.currentPage,
-               keyword:this.keyword
+               keywords:this.keyWord
             }
           }).then((res) => {
-            if (res.data.Code == 200) {
-               this.tableData = res.data.Data.ItemList;
-               this.totalCount = res.data.Data.RecordCount;
+            if (res.data.code == 200) {
+               this.dataList = res.data.data;
+               this.totalCount = res.data.recordCount;
             }else {
-               this.$message({
-                  message: res.data.Description,
-                  type: 'error'
-               });
+               this.$message.error(res.data.Description);
             }
           })
        },
@@ -202,7 +218,7 @@
               UserType:row.UserType
             }).then((res) => {
               if (res.data.Code == 200) {
-                 this.getExplicitWordList();
+                 this.getDataList();
                  this.$message({
                     message: '修改成功！',
                     type: 'success'
@@ -248,7 +264,7 @@
             }
           }).then((res) => {
             if (res.data.Code == 200) {
-               this.tableData = res.data.Data.ItemList;
+               this.dataList = res.data.Data.ItemList;
             }else {
                this.$message({
                   message: res.data.Description,
@@ -261,20 +277,20 @@
       handleSizeChange(val) {
         this.pageCount = val;
         this.currentPage = 1;
-        this.getExplicitWordList()
+        this.getDataList()
       },
       //点击页数，请求第几页
       handleCurrentChange(val) {
         this.currentPage = val;
         console.log('in')
-        this.getExplicitWordList()
+        this.getDataList()
       },
      },
      mounted() {
         this.setWindow(window.innerWidth,window.innerHeight);
-        this.getExplicitWordList('');
-        this.getExplicitWordList(true);
-        this.getExplicitWordList(false);
+        this.getDataList('');
+        this.getDataList(true);
+        this.getDataList(false);
         window.onresize = ()=>{
            this.setWindow(window.innerWidth,window.innerHeight);
         }

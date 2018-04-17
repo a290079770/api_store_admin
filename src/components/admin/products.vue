@@ -10,7 +10,9 @@
         <el-col :span="18" >
           <el-button
           size="success"
+          v-if="isSuperAdmin"
           @click="openProductDialog(1)" icon="el-icon-plus">新增产品</el-button>
+          <span v-else>&nbsp;</span>
         </el-col>
         <el-col :span="6" >
             <el-input 
@@ -53,6 +55,7 @@
             <el-button
               size="small"
               type="success"
+              v-show="isSuperAdmin"
               @click="openProductDialog(2,scope.$index, scope.row)">修改</el-button>   
 <!--             <el-button
               size="small"
@@ -100,6 +103,7 @@
             cp: 1,
             totalCount: 0,
             pid:null,
+            isSuperAdmin:JSON.parse(sessionStorage.userInfo).UserType == 3 ? true : false,
         }
      },
 

@@ -128,6 +128,16 @@ class Api extends Controller
         //提取输入参数和输出参数
        $inputs = request()->post('InputParams/a') ? request()->post('InputParams/a') : array();
        $outputs = request()->post('OutputParams/a') ? request()->post('OutputParams/a') : array();  // /a表示接受一個數組
+       foreach ($inputs as $k => $v) {
+       	  $v['IsNecessary'] = $v['IsNecessary'] === 'true'? 1 : 0;
+          $inputs[$k] = $v;
+	   }
+
+	   foreach ($outputs as $k => $v) {
+          $v['IsNecessary'] = $v['IsNecessary'] === 'true'? 1 : 0;
+          $outputs[$k] = $v;
+	   }
+
 
        $arr = array(
          'Title' => request()->post('Title'),
@@ -318,7 +328,7 @@ class Api extends Controller
 	       ->where('ApiId',request()->get('ApiId'))
 	       ->select();
 
-	       $api['OutputParams'] = Db::name('input_params')
+	       $api['OutputParams'] = Db::name('output_params')
 	       ->where('ApiId',request()->get('ApiId'))
 	       ->select();
           

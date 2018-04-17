@@ -7,17 +7,17 @@
        <span class="yellow-place"></span>
      </div>
      <div class="add-exp-form">
-        <el-form :model="form" style="width:94%;" :label-width="formLabelWidth">
+        <el-form :model="form" style="width:94%;" :label-width="formLabelWidth" :rules="formRules" ref="apiDetail">
 
-          <el-form-item label="API名称" >
+          <el-form-item label="API名称" prop="Title">
             <el-input v-model="form.Title" placeholder="请输入名称" auto-complete="off"></el-input>
           </el-form-item>
 
-          <el-form-item label="中文说明">
+          <el-form-item label="中文说明" prop="ApiTitle">
             <el-input v-model="form.ApiTitle" placeholder="请输入中文说明" auto-complete="off"></el-input>
           </el-form-item>
 
-          <el-form-item label="所属分类">
+          <el-form-item label="所属分类" prop="CateId">
              <el-select :disabled="isAddCateInputShow" v-model="form.CateId" placeholder="请选择">
                 <el-option
                   v-for="(item,index) in categoryList"
@@ -36,7 +36,7 @@
               <i class="el-icon-circle-close api-add-icon close-param" v-show="isAddCateInputShow" @click="addCateInput = '';isAddCateInputShow = false;"></i>
           </el-form-item>
 
-          <el-form-item label="请求方式">
+          <el-form-item label="请求方式" prop="Methods">
             <el-radio v-model="form.Methods" label="GET" border>GET</el-radio>
             <el-radio v-model="form.Methods" label="POST" border>POST</el-radio>
           </el-form-item>
@@ -156,6 +156,14 @@
 <script>
    export default {
      data(){
+      function checkApiTitle(rule, value, callback){
+        let reg = /[^a-zA-Z0-9_/]/g;
+        if (reg.test(value)) {
+          callback(new Error('不能存在特殊字符，只能是英文字符、_、/等！'))
+        } else {
+          callback();
+        }
+      }
       return {
            winWidth:window.innerWidth,
            winHeight:window.innerHeight,
@@ -169,6 +177,22 @@
               InputParams:[],
               OutputParams:[],
               ProductId:this.$route.query.proId
+           },
+
+           formRules:{
+              Title:[
+                {required:true,message:'api接口名不能为空！',trigger: 'blur'},
+                { validator: checkApiTitle, trigger: 'blur' }
+              ],
+              Methods:[
+                {required:true,message:'请选择请求方式！',trigger: 'blur'},
+              ],
+              ApiTitle:[
+                {required:true,message:'api中文名不能为空！',trigger: 'blur'},
+              ],
+              CateId:[
+                {type:'number',required:true,message:'请选择api所属的分类！',trigger: 'blur'},
+              ],
            },
 
            formLabelWidth: '120px',
@@ -219,23 +243,28 @@
         * @return   {[type]}   [description]
         */
        createOrUpdate() {
-         this.$http.post('/api/createOrUpdate',this.form)
-          .then((res)=>{
-              if(res.data.code == 200) {
-                 this.$message.success(res.data.description);
+         this.$refs['apiDetail'].validate((valid) => {
+          if (valid) {
+             this.$http.post('/api/createOrUpdate',this.form)
+            .then((res)=>{
+                if(res.data.code == 200) {
+                   this.$message.success(res.data.description);
 
-                 setTimeout(()=>{
-                    this.$router.push({
-                      path:'/admin/apiList',
-                      query:{
-                        proId:this.$route.query.proId
-                      }
-                    })
-                 }, 1000)   
-              }else {
-                 this.$message.error(res.data.description);
-              }
-          })
+                   setTimeout(()=>{
+                      this.$router.push({
+                        path:'/admin/apiList',
+                        query:{
+                          proId:this.$route.query.proId
+                        }
+                      })
+                   }, 1000)   
+                }else {
+                   this.$message.error(res.data.description);
+                }
+            })
+          }
+        })  
+         
        },
 
        /**

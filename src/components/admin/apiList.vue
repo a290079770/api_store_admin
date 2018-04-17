@@ -10,7 +10,9 @@
         <el-col :span="16" >
           <el-button
           size="success"
+          v-if="isSuperAdmin"
           @click="createOrUpdateApi(1)" icon="el-icon-plus">新增API</el-button>
+          <span v-else>&nbsp;</span>
         </el-col>
 
         <el-col :span="8" >
@@ -70,6 +72,7 @@
               <el-button
                 size="small"
                 type="success"
+                v-show="isSuperAdmin"
                 @click="createOrUpdateApi(2,scope.row)">修改</el-button>
               
             </template>
@@ -90,6 +93,7 @@
             dataList: [],
             dialogVisible:false,
             keyWord:'',
+            isSuperAdmin:JSON.parse(sessionStorage.userInfo).UserType == 3 ? true : false,
         }
      },
      methods:{
@@ -126,6 +130,7 @@
          let query = {
              proId:this.$route.query.proId
           }
+         let path = type == 1 ? '/admin/apiCreate' : '/admin/apiUpdate';
          
          //如果是修改，需要带apiId
          if(type == 2) {
@@ -133,9 +138,9 @@
          }
 
          this.$router.push({
-            path:'/admin/apiCreate',
-            query:query
-          })
+            path,
+            query
+         })
       }, 
       
       /**
@@ -148,7 +153,8 @@
         this.$router.push({
           path:'/admin/apiDetail',
           query:{
-            apiId:item.Id
+            apiId:item.Id,
+            proId:this.$route.query.proId
           }
         })
       },

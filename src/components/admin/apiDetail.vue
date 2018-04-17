@@ -2,7 +2,7 @@
   <div class="index-cont" :style="{height:winHeight +'px',width: '92%',margin:'30px auto'}">
      <div class="table-page-title">
        <h3>
-         用户列表 / <span class="apilist-product-title">多维边疆</span> / <span class="apilist-product-title">返回</span>
+         {{form.ApiTitle}} / <span class="apilist-product-title">{{product.Title}}</span> / <span style="cursor:pointer" class="apilist-product-title" @click="$router.go(-1)">返回</span>
        </h3>
        <span class="yellow-place"></span>
      </div>
@@ -10,32 +10,30 @@
         <el-form :model="form" style="width:94%;" :label-width="formLabelWidth">
 
           <el-form-item label="API名称：" >
-             <span class="detail-green">/ApplyLog/Pass</span>
+             <span class="detail-green">{{form.Title}}</span>
           </el-form-item>
 
           <el-form-item label="API名称：" >
-             <span class="detail-green">审核通过</span>
+             <span class="detail-green">{{form.ApiTitle}}</span>
           </el-form-item>
 
           <el-form-item label="请求方式：">
-            <el-radio v-model="form.method" label="1" border>GET</el-radio>
-            <el-radio v-model="form.method" label="2" border>POST</el-radio>
+            <el-radio v-model="form.Methods" label="GET" border>GET</el-radio>
+            <el-radio v-model="form.Methods" label="POST" border>POST</el-radio>
           </el-form-item>
 
-          <el-form-item label="系统参数：">
+<!--           <el-form-item label="系统参数：">
             <el-checkbox v-model="form.needSys">需要系统参数</el-checkbox>
-          </el-form-item>
+          </el-form-item> -->
 
-          <el-form-item label="签名状态：">
+<!--           <el-form-item label="签名状态：">
             <el-checkbox v-model="form.needToken">需要签名</el-checkbox>
-          </el-form-item>
+          </el-form-item> -->
 
           <el-form-item label="输入参数：">
               <el-table
-                :data="tableData"
-                style="width: 100%"
+                :data="form.InputParams"
                 :border="true"
-                :stripe="true"
                 >
                 <el-table-column
                   prop="Title"
@@ -56,7 +54,7 @@
                 </el-table-column>
 
                 <el-table-column
-                  label="必须"
+                  label="是否必须"
                   >
                   <template slot-scope="scope">
                      {{scope.row.IsNecessary ? '是':'否'}}
@@ -72,7 +70,7 @@
 
           <el-form-item label="输出参数：">
               <el-table
-                :data="tableData"
+                :data="form.OutputParams"
                 style="width: 100%"
                 :border="true"
                 :stripe="true"
@@ -96,7 +94,7 @@
                 </el-table-column>
 
                 <el-table-column
-                  label="必须"
+                  label="是否必须"
                   >
                   <template slot-scope="scope">
                      {{scope.row.IsNecessary ? '是':'否'}}
@@ -110,9 +108,9 @@
           </el-form-item>
 
           <el-form-item label="URL调用示例：">
-            <a class="detail-green" href="http://api.koi.kingchannels.cn//ApplyLog/Pass">http://api.koi.kingchannels.cn//ApplyLog/Pass</a>
+            <a class="detail-green" :href="product.Url + form.Title">{{product.Url + form.Title}}</a>
           </el-form-item>
-
+<!-- 
           <el-form-item label="返回数据结构：">
             <pre>
               {
@@ -120,13 +118,11 @@
                 b:'l4'
               }
             </pre>
-          </el-form-item>
+          </el-form-item> -->
 
           <el-form-item label="描述：">
-            通过审核的内容
+            {{form.Description}}
           </el-form-item>
-
-
         </el-form>
 
     </div>
@@ -141,64 +137,77 @@
            winWidth:window.innerWidth,
            winHeight:window.innerHeight,
            form: {
-              title: '钢筋混泥土加固',
-              category: '科学',
-              description:'',
-              method:'1',
-              needSys:false,
-              needToken:false,
+              Id:this.$route.query.apiId,
+              Title:'',
+              Description:'',
+              ApiTitle:'',
+              CateId:'',
+              Methods:'GET',
+              InputParams:[],
+              OutputParams:[],
+              ProductId:this.$route.query.proId
            },
-           params:[
-              {
-                title:'',
-                desc:'',
-                type:'',
-                default:'',
-                test:'',
-                isNecessary:false,
-              },
-              {
-                title:'',
-                desc:'',
-                type:'',
-                default:'',
-                test:'',
-                isNecessary:false,
-              }
-           ],
+
+           product:{
+
+           },
+
            formLabelWidth: '150px',
 
-           tableData: [{
-              Title: '参数1',
-              Description: '用户昵称',
-              Type: 'String',
-              IsNecessary: false,
-              Default: ''
-            },{
-              Title: '参数1',
-              Description: '用户昵称',
-              Type: 'String',
-              IsNecessary: false,
-              Default: ''
-            },{
-              Title: '参数1',
-              Description: '用户昵称',
-              Type: 'String',
-              IsNecessary: false,
-              Default: ''
-            },{
-              Title: '参数1',
-              Description: '用户昵称',
-              Type: 'String',
-              IsNecessary: false,
-              Default: ''
-            },]
 
         }
      },
      methods:{
+       /**
+        * [getDetail 获取api详情]
+        * @Author   罗文
+        * @DateTime 2018-04-17
+        * @return   {[type]}   [description]
+        */
+       getDetail() {
+         this.$http.get('/api/detail',{
+            params:{
+              ApiId:this.$route.query.apiId
+            }
+          })
+          .then((res)=>{
+              if(res.data.code == 200) {
+                  res.data.data.InputParams = res.data.data.InputParams.map((item)=>{
+                     item.IsNecessary = item.IsNecessary === 0 ? false : true;
+                     return item;
+                  })
 
+                  res.data.data.OutputParams = res.data.data.OutputParams.map((item)=>{
+                     item.IsNecessary = item.IsNecessary === 0 ? false : true;
+                     return item;
+                  })
 
+                  this.form = res.data.data;
+              }else {
+                  this.$message.error(res.data.description);
+              }
+          })
+       },
+
+       getProduct() {
+          this.$http.get('/product/detail',{
+            params:{
+              Id:this.$route.query.proId
+            }
+          })
+          .then((res)=>{
+              if(res.data.code == 200) {
+                this.product = res.data.data;
+              }else {
+                this.$message.error(res.data.description);
+              }
+          })
+       }
+
+     },
+     created() {
+       this.getDetail();
+       this.getProduct();
      },
      mounted() {
 
