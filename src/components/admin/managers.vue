@@ -75,7 +75,7 @@
           <template slot-scope="scope">
             <el-button
               size="small"
-              @click="handleUpdateUser(scope.$index, scope.row)">重置密码</el-button>  
+              @click="updatePwd(scope.row)">重置密码</el-button>  
             <el-button
               size="small"
               type="danger"
@@ -157,16 +157,16 @@
               NickName: '' 
             },
             formRules:{
-              // Account:[
-              //   {required:true,message:'账号不能为空！',trigger: 'blur'},
-              //   { validator: checkApiTitle, trigger: 'blur' }
-              // ],
-              // Password:[
-              //   {required:true,message:'请输入密码！',trigger: 'blur'},
-              // ],
-              // NickName:[
-              //   {required:true,message:'请输入管理员昵称！',trigger: 'blur'},
-              // ],
+              Account:[
+                {required:true,message:'账号不能为空！',trigger: 'blur'},
+                { validator: checkApiTitle, trigger: 'blur' }
+              ],
+              Password:[
+                {required:true,message:'请输入密码！',trigger: 'blur'},
+              ],
+              NickName:[
+                {required:true,message:'请输入管理员昵称！',trigger: 'blur'},
+              ],
             },
             state:1, //用户状态，1--正常，2--已锁定，3-没有激活
             pageCount: 10,
@@ -217,39 +217,23 @@
         * @return   {[type]}         [description]
         */
        handleDelete(index,row) {
-            let state = 1;
-
-            switch (row.State) {
-              case 1:
-                state = 2;
-                break;
-              case 2:
-                state = 1;
-                break;
-              default:
-                // statements_def
-                break;
-            }
-
-            this.$http.post('/User/Update',{
-              UserId:row.Id,
-              State:state,
-              UserType:row.UserType
-            }).then((res) => {
-              if (res.data.Code == 200) {
-                 this.getDataList();
-                 this.$message({
-                    message: '修改成功！',
-                    type: 'success'
-                  });
-                 this.dialogVisible = false;
-              }else {
-                 this.$message({
-                    message: res.data.Description,
-                    type: 'error'
-                  });
-                }
+          this.$confirm('确定删除该用户或管理员？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+             this.$http.post('/user/delete',{
+              Id:row.Id,
              })
+              .then((res)=>{
+                  if(res.data.code == 200) {
+                     this.$message.success(res.data.description);
+                     this.getDataList();
+                  }else {
+                     this.$message.error(res.data.description);
+                  }
+              })
+          })
        },
 
        /**
@@ -272,19 +256,16 @@
        handleAddUsers(){
         this.$refs['addUsers'].validate((valid) => {
           if (valid) {
+             this.formLabelAlign.Password = hex_sha1(this.formLabelAlign.Password);
              this.$http.post('/user/createOrUpdate',this.formLabelAlign)
             .then((res)=>{
                 if(res.data.code == 200) {
                    this.$message.success(res.data.description);
+                   this.getDataList(); 
 
-                   setTimeout(()=>{
-                      this.$router.push({
-                        path:'/admin/apiList',
-                        query:{
-                          proId:this.$route.query.proId
-                        }
-                      })
-                   }, 1000)   
+                   this.dialogVisible = false;
+
+                   this.$refs['addUsers'].resetFields();
                 }else {
                    this.$message.error(res.data.description);
                 }
@@ -292,6 +273,32 @@
           }
         })  
     
+       },
+       
+       /**
+        * [updatePwd 重置密码]
+        * @Author   罗文
+        * @DateTime 2018-04-17
+        * @return   {[type]}   [description]
+        */
+       updatePwd(item) {
+         this.$confirm('确认将该管理员的密码重置为123456?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+           this.$http.post('/user/updatePwd',{
+            Id:item.Id,
+            Password:hex_sha1('123456')
+           })
+            .then((res)=>{
+                if(res.data.code == 200) {
+                   this.$message.success(res.data.description);
+                }else {
+                   this.$message.error(res.data.description);
+                }
+            })
+        })
        },
        
       //搜索

@@ -171,8 +171,34 @@ class User extends Controller
          $this->response->setResponse(21,'昵称不能为空！');
          return;
       }
+      if(!$va->check(request()->post())) {
+          $this->response->setResponse(21,'昵称不能含有非法字符！');
+          return;
+      }
 
+      $user = request()->post();
 
+      $user['CreateTime'] =  date('Y-m-d H:i:s',time());
+
+      $res = Db::name('users')->insert($user);
+
+      if($res == 1) {
+         $userId = Db::name('users')->getLastInsID();
+         $this->response->setResponse(200,'新增管理员成功！',$userId);
+      }else {
+         $this->response->setResponse(21,'新增管理员失败！');
+      }
+
+      //添加其他数据，CreateTime status  UserType  LastTime LastIp  ThisTime  ThisIp
+      // $pre = array(
+      //    'CreateTime'=>date('Y-m-d H:i:s',time()),
+      //    'Status'=>1,
+      //    'UserType'=>1,
+      //    'LastTime'=>'',
+      //    'LastIp'=>'',
+      //    'ThisTime'=>'',
+      //    'ThisIp'=>''
+      // );
 
     }
 
@@ -217,30 +243,69 @@ class User extends Controller
       }
 
       //验证id
-      if(!request()->post('userId')) {
+      if(!request()->post('Id')) {
         $this->response->setResponse(21,'用户编号不能为空！');
         return;
       }
 
       //验证新密码是否传入
-      if(!request()->post('newPwd')) {
+      if(!request()->post('Password')) {
         $this->response->setResponse(21,'新密码不能为空！');
         return;
       }
 
-      $arr = Db::name('users')->where('id',request()->post('userId'))->select();
+      $arr = Db::name('users')->where('Id',request()->post('Id'))->select();
 
       //对比数据库
       if(!$arr) {
         $this->response->setResponse(21,'未获取到用户信息，修改失败！');
-      }else if($arr[0]['Password'] == request()->post('newPwd')){
-        $this->response->setResponse(21,'新密码不能与旧密码一致');
-
-      }else if(Db::name('users')->where('id',request()->post('userId'))->update(['Password'=>request()->post('newPwd')]) == 0){
-        $this->response->setResponse(21,'修改密码失败！');
-      }else {
-        $this->response->setResponse(200,'修改成功！');
       }
+
+      Db::name('users')
+      ->where('Id',request()->post('Id'))
+      ->update(['Password'=>request()->post('Password')]);
+
+      // else if($arr[0]['Password'] == request()->post('Password')){
+      //   $this->response->setResponse(21,'新密码不能与旧密码一致');
+
+      // }
+      // else if(Db::name('users')->where('Id',request()->post('Id'))->update(['Password'=>request()->post('Password')]) == 0){
+      //   $this->response->setResponse(21,'修改密码失败！');
+      // }else {
+        $this->response->setResponse(200,'修改成功！');
+      // }
+    }
+    
+    /**
+     * [delete 删除一个用户或管理员]
+     * @Author   罗文
+     * @DateTime 2018-04-17
+     * @return   [type]     [description]
+     */
+    public function delete()
+    {
+       if(!request()->isPost()) {
+        $this->response->setResponse(21,'请求方式错误！');
+        return;
+      }
+
+      //验证id
+      if(!request()->post('Id')) {
+        $this->response->setResponse(21,'用户编号不能为空！');
+        return;
+      }
+
+
+      $res = Db::name('users')
+      ->where('Id',request()->post('Id'))
+      ->delete();
+
+      if($res) {
+        $this->response->setResponse(200,'删除成功！');
+      }else {
+        $this->response->setResponse(21,'删除失败！');
+      }
+
     }
 
     //验证账号和密码是否传入
@@ -269,6 +334,7 @@ class User extends Controller
         return true;
     }
 
+     
      //返回数据
     private function setResponse($code,$description,$data='',$recordCount=0) 
     {
