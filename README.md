@@ -37,7 +37,7 @@
   b、因为本项目api接口是虚拟主机，所以需要先配置虚拟主机相关
   
      ``` bash
-        # 进入你的apache服务器目录
+        # 进入你的apache服务器目录
         如我的： E:\phpstudy\Apache\conf
 
         # 修改 httpd.conf 配置文件
@@ -61,22 +61,24 @@
         
         注意：这里可以你在保存hosts文件的时候会给你提示不能在当前目录下修改文件，或权限不够，你可以将hosts拖出到桌面，修改完成后，拖回这个目录
         重启服务器
-     ```
+     ```
      
    c、完成虚拟主机配置后，只差最后一步
       将本项目根目录下的  /api 文件夹整个拖入到 E:\phpstudy\WWW\ 下 ,再次说明，这个目录是我电脑的
       
    e、导入数据库
       将本项目根目录下的 /sql 文件夹中的 sql 文件导入到你自己的mysql中，如果你不会，可以参照如下方式
-      ①、安装Navicat Premium 图形化界面
-      ②、记得运行起phpstudy等php环境
-      ③、运行Navicat Premium，点击连接 - 输入密码 root - 点击确定
-      ④、左侧会出现localhost_3306,双击 出现information_schema、mysql、performance_schema、test等四个数据库
-      ⑤、右击localhost_3306，新建数据库，
-         数据库名：api_store
-         字符集:utf8 最下面
-         排序规则：utf8_general_ci
-      ⑥、双击api_store，右键 api_store，导入sql，然后选择本项目的sql/sql文件，一路下一步点下去就好
+       ``` bash
+          ①、安装Navicat Premium 图形化界面
+          ②、记得运行起phpstudy等php环境
+          ③、运行Navicat Premium，点击连接 - 输入密码 root - 点击确定
+          ④、左侧会出现localhost_3306,双击 出现information_schema、mysql、performance_schema、test等四个数据库
+          ⑤、右击localhost_3306，新建数据库，
+             数据库名：api_store
+             字符集:utf8 最下面
+             排序规则：utf8_general_ci
+          ⑥、双击api_store，右键 api_store，导入sql，然后选择本项目的sql/sql文件，一路下一步点下去就好
+       ```
       
    d、至此，完成后台的本机部署，可以运行尝试检验 
       浏览器打开   api.com/admin/user/userList    看能否获取到数据
