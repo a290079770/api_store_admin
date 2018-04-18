@@ -36,39 +36,36 @@
   
   b、因为本项目api接口是虚拟主机，所以需要先配置虚拟主机相关
   
-     ``` bash
-        # 进入你的apache服务器目录
-        如我的： E:\phpstudy\Apache\conf
+  # 进入你的apache服务器目录
+  如我的： E:\phpstudy\Apache\conf
 
-        # 修改 httpd.conf 配置文件
-        去掉：#Include conf/extra/httpd-vhosts.conf   之前的 # 号，目的是允许启用虚拟主机的配置文件
-        重启服务器
+  # 修改 httpd.conf 配置文件
+  去掉：#Include conf/extra/httpd-vhosts.conf   之前的 # 号，目的是允许启用虚拟主机的配置文件
+  重启服务器
 
-        # 配置api.com的虚拟主机，进入目录 E:\phpstudy\Apache\conf\extra，注意这个目录是我的，你对应找自己的，修改httpd-vhosts.conf文件，
-        任意位置，添加如下代码
-        <VirtualHost *:80>
-           DocumentRoot "E:\phpstudy\WWW\api\public"
-           ServerName api.com
-        </VirtualHost>
-        
-        注意：DocumentRoot是虚拟主机的目录，如果你是用phpstudy，可以将api接口放在www文件夹下，其他应用可以参考或百度谷歌：
-        
-        # 修改 hosts 文件
-        进入目录 C:\Windows\System32\drivers\etc，这个应该是windows通用的
-        修改hosts文件，最末尾添加一行 
-        127.0.0.1       api.com 
-        目的是将api.com的dns解析到 127.0.0.1这个ip下，也就是本地服务器
-        
-        注意：这里可以你在保存hosts文件的时候会给你提示不能在当前目录下修改文件，或权限不够，你可以将hosts拖出到桌面，修改完成后，拖回这个目录
-        重启服务器
-     ```
+  # 配置api.com的虚拟主机，进入目录 E:\phpstudy\Apache\conf\extra，注意这个目录是我的，你对应找自己的，修改httpd-vhosts.conf文件，
+  任意位置，添加如下代码
+  <VirtualHost *:80>
+     DocumentRoot "E:\phpstudy\WWW\api\public"
+     ServerName api.com
+  </VirtualHost>
+
+  注意：DocumentRoot是虚拟主机的目录，如果你是用phpstudy，可以将api接口放在www文件夹下，其他应用可以参考或百度谷歌：
+
+  # 修改 hosts 文件
+  进入目录 C:\Windows\System32\drivers\etc，这个应该是windows通用的
+  修改hosts文件，最末尾添加一行 
+  127.0.0.1       api.com 
+  目的是将api.com的dns解析到 127.0.0.1这个ip下，也就是本地服务器
+
+  注意：这里可以你在保存hosts文件的时候会给你提示不能在当前目录下修改文件，或权限不够，你可以将hosts拖出到桌面，修改完成后，拖回这个目录
+  重启服务器
      
    c、完成虚拟主机配置后，只差最后一步
       将本项目根目录下的  /api 文件夹整个拖入到 E:\phpstudy\WWW\ 下 ,再次说明，这个目录是我电脑的
       
    e、导入数据库
       将本项目根目录下的 /sql 文件夹中的 sql 文件导入到你自己的mysql中，如果你不会，可以参照如下方式
-       ``` bash
           ①、安装Navicat Premium 图形化界面
           ②、记得运行起phpstudy等php环境
           ③、运行Navicat Premium，点击连接 - 输入密码 root - 点击确定
@@ -78,7 +75,6 @@
              字符集:utf8 最下面
              排序规则：utf8_general_ci
           ⑥、双击api_store，右键 api_store，导入sql，然后选择本项目的sql/sql文件，一路下一步点下去就好
-       ```
       
    d、至此，完成后台的本机部署，可以运行尝试检验 
       浏览器打开   api.com/admin/user/userList    看能否获取到数据
