@@ -1,4 +1,11 @@
-# my-project
+该项目是我的api文档仓库
+
+前端界面是 Vue 开发
+
+后台API是 PHP 开发
+
+运行项目的方式
+
 
 > A Vue.js project
 
