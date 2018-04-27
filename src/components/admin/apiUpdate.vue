@@ -17,23 +17,32 @@
             <el-input v-model="form.ApiTitle" placeholder="请输入中文说明" auto-complete="off"></el-input>
           </el-form-item>
 
-          <el-form-item label="所属分类" prop="CateId">
-             <el-select :disabled="isAddCateInputShow" v-model="form.CateId" placeholder="请选择">
-                <el-option
-                  v-for="(item,index) in categoryList"
-                  :key="index"
-                  :label="item.label"
-                  :value="item.value">
-                </el-option>
-              </el-select>
+          <el-form-item label="所属分类" required>
+            <el-col :span="4">
+              <el-form-item prop="CateId">
+                <el-select :disabled="isAddCateInputShow" v-model="form.CateId" placeholder="请选择">
+                  <el-option
+                    v-for="(item,index) in categoryList"
+                    :key="index"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
+               </el-form-item>
+            </el-col>
 
-              <i class="el-icon-circle-plus-outline api-add-icon" v-show="!isAddCateInputShow" @click="isAddCateInputShow = true"></i>
+            <el-col :span="11">
+              <el-form-item>
+                  <i class="el-icon-circle-plus-outline api-add-icon" v-show="!isAddCateInputShow" @click="isAddCateInputShow = true"></i>
 
-              <el-input v-model="addCateInput" placeholder="请输入中文说明" auto-complete="off" style="width:20%" v-show="isAddCateInputShow"></el-input>
+                  <el-input v-model="addCateInput" placeholder="请输入中文说明" auto-complete="off" style="width:170px" v-show="isAddCateInputShow"></el-input>
 
-              <i class="el-icon-circle-check api-add-icon" v-show="isAddCateInputShow" @click="addCategory"></i>
+                  <i class="el-icon-circle-check api-add-icon" v-show="isAddCateInputShow" @click="addCategory"></i>
 
-              <i class="el-icon-circle-close api-add-icon close-param" v-show="isAddCateInputShow" @click="addCateInput = '';isAddCateInputShow = false;"></i>
+                  <i class="el-icon-circle-close api-add-icon close-param" v-show="isAddCateInputShow" @click="addCateInput = '';isAddCateInputShow = false;">
+                  </i>
+               </el-form-item>
+            </el-col>
           </el-form-item>
 
           <el-form-item label="请求方式" prop="Methods">
@@ -99,7 +108,7 @@
                 <el-col :span="3" style="margin-right:4px">
                   <el-input v-model="item.Type" placeholder="类型" auto-complete="off"></el-input>
                 </el-col>
-
+<!-- 
                 <el-col :span="4" style="margin-right:4px">
                   <el-input v-model="item.Default" placeholder="默认值" auto-complete="off"></el-input>
                 </el-col>
@@ -110,7 +119,7 @@
 
                 <el-col :span="3" style="margin-right:4px">
                   <el-checkbox v-model="item.IsNecessary">是否必须</el-checkbox>
-                </el-col>
+                </el-col> -->
 
                 <el-col :span="1" class="close-param">
                   <i class="el-icon-circle-close" @click="removeParams(2,index)"></i>
@@ -257,10 +266,6 @@
                      return item;
                   })
 
-                  res.data.data.OutputParams = res.data.data.OutputParams.map((item)=>{
-                     item.IsNecessary = item.IsNecessary === 0 ? false : true;
-                     return item;
-                  })
 
                   this.form = res.data.data;
               }else {
@@ -349,7 +354,12 @@
           if(type == 1) {
             this.form.InputParams.push(newParams);
           }else {
-            this.form.OutputParams.push(newParams);
+            this.form.OutputParams.push({
+              Title:'',
+              Description:'',
+              Type:'',
+              ApiId:this.$route.query.apiId
+            });
           }
        },
        

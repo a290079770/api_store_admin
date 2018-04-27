@@ -32,17 +32,21 @@
         :data="item.ItemList"
         :border="true"
         >
-          <el-table-column
+<!--           <el-table-column
             label="编号"
             prop="Id"
             width="100">
-          </el-table-column>
+          </el-table-column> -->
 
           <el-table-column
             label="接口名称"
-            width="150"
-            prop="Title"
+            width="200"
             >
+            <template slot-scope="scope">
+              <span @click="handleViewApiDetail(scope.row)" class="apilist-green">
+                {{scope.row.Title}}
+              </span>
+            </template>
           </el-table-column>
 
           <el-table-column
@@ -55,7 +59,7 @@
             label="请求方式"
             align="center"
             prop="Methods"
-            width="150"
+            width="200"
             >
           </el-table-column>
 
@@ -199,6 +203,11 @@
 
    .el-table__body-wrapper {
       overflow: hidden !important;
+   }
+
+   .apilist-green {
+      color:#13ce66;
+      cursor: pointer;
    }
 </style>
 

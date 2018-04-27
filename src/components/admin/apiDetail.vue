@@ -78,6 +78,14 @@
                 <el-table-column
                   prop="Title"
                   label="名称"
+                  width="250px"
+                  >
+                </el-table-column>
+
+                <el-table-column
+                  prop="Type"
+                  label="类型"
+                  width="250px"
                   >
                 </el-table-column>
 
@@ -87,42 +95,16 @@
                   >
                 </el-table-column>
 
-                <el-table-column
-                  prop="Type"
-                  label="类型"
-                  >
-                </el-table-column>
-
-                <el-table-column
-                  label="是否必须"
-                  >
-                  <template slot-scope="scope">
-                     {{scope.row.IsNecessary ? '是':'否'}}
-                  </template>
-                </el-table-column>
-                <el-table-column
-                  prop="Default"
-                  label="默认值">
-                </el-table-column>
               </el-table>
           </el-form-item>
 
           <el-form-item label="URL调用示例：">
-            <a class="detail-green" :href="product.Url + form.Title">{{product.Url + form.Title}}</a>
+            <a class="detail-green" :href="requestUrl">{{requestUrl}}</a>
           </el-form-item>
-<!-- 
-          <el-form-item label="返回数据结构：">
-            <pre>
-              {
-                a:'zhangsan',
-                b:'l4'
-              }
-            </pre>
-          </el-form-item> -->
 
-          <el-form-item label="描述：">
+<!--           <el-form-item label="描述：">
             {{form.Description}}
-          </el-form-item>
+          </el-form-item> -->
         </el-form>
 
     </div>
@@ -148,12 +130,9 @@
               ProductId:this.$route.query.proId
            },
 
-           product:{
-
-           },
-
+           product:{},
            formLabelWidth: '150px',
-
+           requestUrl:'',
 
         }
      },
@@ -183,6 +162,8 @@
                   })
 
                   this.form = res.data.data;
+
+                  this.getProduct();
               }else {
                   this.$message.error(res.data.description);
               }
@@ -198,6 +179,17 @@
           .then((res)=>{
               if(res.data.code == 200) {
                 this.product = res.data.data;
+
+                //设置调用url链接
+                if(this.form.Methods == 'GET') {
+                   let queryStr = '';
+
+                   this.form.InputParams.forEach((item,index)=>{
+                      queryStr += item.Title + '=' + item.Test + '&' ;
+                   })
+
+                   this.requestUrl = 'http://'+this.product.Url + this.form.Title + '?'+queryStr.slice(0,-1);
+                }else this.requestUrl = 'http://'+this.product.Url + this.form.Title;
               }else {
                 this.$message.error(res.data.description);
               }
@@ -207,7 +199,6 @@
      },
      created() {
        this.getDetail();
-       this.getProduct();
      },
      mounted() {
 
