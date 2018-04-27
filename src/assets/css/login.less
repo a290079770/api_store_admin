@@ -7,11 +7,14 @@
 }
 
 .login {
+  position: relative;
+  z-index: 2;
   .flex-center(center,center);
   background: black;
   h1 {
     position: fixed;
     left: 0;
+    z-index: 2;
     text-align: center;
     color:@primary;
     width: 100%;
@@ -48,11 +51,13 @@
   .loginform {
     position: absolute;
     top: 50%;
+    z-index: 2;
     width: 335px;
     padding: 35px 35px 20px 35px;
     margin: -150px -200px;
     opacity: 0.9;
     background:transparent;
+    // background:rgba(16, 16, 16, 0.5);
   }
   .retrieve-password {
     line-height: 46px;

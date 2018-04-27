@@ -1,5 +1,6 @@
 <template>
   <div class="login" :style="{width:winWidth +'px',height:winHeight +'px'}">
+     <iframe class="login-bg-iframe" width="100%" height="100%" iframeborder="0" src="./static/plug/叶子-可做背景.html"></iframe>
      <h1 
      :style="{top:headTop +'px',opacity:headTop/100 * 2}"
      ref="headShake"
@@ -9,15 +10,15 @@
 
        欢迎登陆NOVEN的专属API管理后台
      </h1>
-     <img 
-     src="../../assets/images/login-start.png"  
+<!--      <img 
+     src="../../assets/images/login-start.jpg"  
      :width="imgWidth"
      :style="{left:imgLeft + '%'}"
      class="login-start" 
      @mouseenter="imgWidth *= 1.1"
      @mouseleave="imgWidth /= 1.1"
      @click="openLoginForm"
-     >
+     > -->
 
      <div class="content">
           <el-form 
@@ -342,7 +343,9 @@ export default {
 
     this.headTopAnimate();
     setTimeout(()=>{
-      this.imgAnimation1();
+      // this.imgAnimation1();
+
+      this.openLoginForm();
     }, 800);
 
     
@@ -362,6 +365,11 @@ export default {
 }
 </script>
 <style lang="less">
-
+   .login-bg-iframe {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 1;
+   }
 
 </style>
