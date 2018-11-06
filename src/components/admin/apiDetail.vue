@@ -18,8 +18,8 @@
           </el-form-item>
 
           <el-form-item label="请求方式：">
-            <el-radio v-model="form.Methods" label="GET" border>GET</el-radio>
-            <el-radio v-model="form.Methods" label="POST" border>POST</el-radio>
+            <el-radio v-model="form.Methods" :disabled="form.Methods == 'POST'" label="GET" border>GET</el-radio>
+            <el-radio v-model="form.Methods" :disabled="form.Methods == 'GET'" label="POST" border>POST</el-radio>
           </el-form-item>
 
 <!--           <el-form-item label="系统参数：">
@@ -99,7 +99,7 @@
           </el-form-item>
 
           <el-form-item label="URL调用示例：">
-            <a class="detail-green" :href="requestUrl">{{requestUrl}}</a>
+            <a class="detail-green" target="_blank" :href="requestUrl">{{requestUrl}}</a>
           </el-form-item>
 
 <!--           <el-form-item label="描述：">
