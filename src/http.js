@@ -15,19 +15,20 @@ import router from './router/router'
 // axios 配置
 axios.defaults.timeout = 5000;
 
-var apiUrl = 'http://api.com/admin';
+var apiUrl = 'http://120.77.180.233:8082/admin';
+axios.defaults.baseURL = apiUrl;
 
-if(apiUrl){
-    var regExp = /^((https?|ftp|news):\/\/)?([a-z]([a-z0-9\-]*[\.。])+([a-z]{2}|aero|arpa|biz|com|coop|edu|gov|info|int|jobs|mil|museum|name|nato|net|org|pro|travel)|(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))(\/[a-z0-9_\-\.~]+)*(\/([a-z0-9_\-\.]*)(\?[a-z0-9+_\-\.%=&]*)?)?(#[a-z][a-z0-9_]*)?$/g;
-    if (apiUrl.match(regExp)){
-        // axios.defaults.baseURL = apiUrl+'/bridge';
-        axios.defaults.baseURL = apiUrl;
-    }else{
-      alert('域名配置不正确，请检查 \n文件路径：/static/config.js')
-    }
-}else{
-   alert('域名不存在，请检查 \n文件路径：/static/config.js')
-}
+// if(apiUrl){
+//     var regExp = /^((https?|ftp|news):\/\/)?([a-z]([a-z0-9\-]*[\.。])+([a-z]{2}|aero|arpa|biz|com|coop|edu|gov|info|int|jobs|mil|museum|name|nato|net|org|pro|travel)|(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))(\/[a-z0-9_\-\.~]+)*(\/([a-z0-9_\-\.]*)(\?[a-z0-9+_\-\.%=&]*)?)?(#[a-z][a-z0-9_]*)?$/g;
+//     if (apiUrl.match(regExp)){
+//         // axios.defaults.baseURL = apiUrl+'/bridge';
+//         axios.defaults.baseURL = apiUrl;
+//     }else{
+//       alert('域名配置不正确，请检查 \n文件路径：/static/config.js')
+//     }
+// }else{
+//    alert('域名不存在，请检查 \n文件路径：/static/config.js')
+// }
 
 // axios.defaults.baseURL = apiUrl;
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';

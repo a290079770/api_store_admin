@@ -133,12 +133,6 @@ class Api extends Controller
           $inputs[$k] = $v;
 	   }
 
-	   foreach ($outputs as $k => $v) {
-          $v['IsNecessary'] = $v['IsNecessary'] === 'true'? 1 : 0;
-          $outputs[$k] = $v;
-	   }
-
-
        $arr = array(
          'Title' => request()->post('Title'),
 	     'Description' => request()->post('Description'),
